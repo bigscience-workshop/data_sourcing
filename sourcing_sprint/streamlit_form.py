@@ -153,6 +153,7 @@ with form_col.expander("Languages"):
             resource_lang_group = st.selectbox(
                 label=f"Language (group) {lni+1}",
                 options=languages,
+                help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language",
             )
             if resource_lang_group == "Niger-Congo":
                 resource_lang_subgroup = st.selectbox(
@@ -173,11 +174,11 @@ with form_col.expander("Languages"):
 with form_col.expander("Locations"):
     resource_dict["resource_locations"] = st.text_input(
         label="Where is the resource located?",
-        help="E.g.: where is the *website* hosted, what is the physical *location of the library*, etc.?",
+        help="E.g.: where is the **website hosted**, what is the physical **location of the library**, etc.?",
     )
     resource_dict["language_locations"] = st.text_input(
         label="Where are the language creators located?",
-        help="E.g.: where are the *people who write* on the website hosted, where are the *media managed by the library* from, etc.?",
+        help="E.g.: where are the **people who write on the website** hosted, where are the **media managed by the library** from, etc.?",
     )
 
 if resource_dict["type"] == "Processed dataset":
@@ -187,13 +188,12 @@ if resource_dict["type"] == "Processed dataset":
     form_col.write("TODO: list and either link OR fill out relevant information")
 
 if resource_dict["type"] == "Primary source":
-    form_col.markdown("#### Primary source type")
-    form_col.write("TODO: taxonomy - website/published work/collection")
     form_col.markdown("#### Primary source availability")
     form_col.write("TODO: how to obtain, license, personal information, will you do it")
-
-form_col.markdown("#### Media type and format")
-form_col.write("TODO: list of formats and expected processing needs")
+    form_col.markdown("#### Primary source type")
+    form_col.write("TODO: taxonomy - website/published work/collection")
+    form_col.markdown("#### Media type and format")
+    form_col.write("TODO: list of formats and expected processing needs")
 
 display_col.markdown("## New catalogue entry: save output\n --- \n")
 display_col.markdown(f"You are entering a new resource of type: *{resource_dict['type']}*")
