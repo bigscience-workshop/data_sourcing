@@ -1,8 +1,12 @@
+import json
 import streamlit as st
 
 ##################
 ## resources
 ##################
+# from Wikipedia and https://unstats.un.org/unsd/methodology/m49/
+regions, countries, region_tree = json.load(open("unstats_regions_countries.json", encoding="utf-8"))
+
 languages = {
     "Arabic": "Arabic",
     "Basque": "Basque",
@@ -58,7 +62,8 @@ indic_languages = [
     "Tamil",
     "Urdu",
 ]
-MAX_LANGS = 10
+MAX_LANGS = 25
+MAX_COUNTRIES = 25
 
 resource_dict = {
     "type": "",
@@ -66,9 +71,9 @@ resource_dict = {
     "uid": "",
     "homepage": "",
     "description": "",
-    "languages": "",
-    "resource_locations": "",
-    "language_locations": "",
+    "languages": [],
+    "resource_location": "",
+    "language_locations": [],
 }
 
 ##################
@@ -146,40 +151,53 @@ form_col.markdown("#### Languages and locations")
 with form_col.expander("Languages"):
     st.write("Add all of the languages that are covered by the resource (see 'Add language' checkbox)")
     resource_languages = []
-    buttons = [False for _ in range(MAX_LANGS+1)]
-    buttons[0] = True
+    buttons_lang = [False for _ in range(MAX_LANGS+1)]
+    buttons_lang[0] = True
     for lni in range(MAX_LANGS):
-        if buttons[lni]:
+        if buttons_lang[lni]:
             resource_lang_group = st.selectbox(
                 label=f"Language (group) {lni+1}",
-                options=languages,
+                options=[''] + list(languages.keys()),
+                format_func=lambda x:languages.get(x, ''),
                 help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language",
             )
             if resource_lang_group == "Niger-Congo":
                 resource_lang_subgroup = st.selectbox(
                     label=f"Niger-Congo language {lni+1}",
-                    options=niger_congo_languages,
+                    options=[''] + niger_congo_languages,
                 )
             elif resource_lang_group == "Indic":
                 resource_lang_subgroup = st.selectbox(
                     label=f"Indic language {lni+1}",
-                    options=indic_languages,
+                    options=[''] + indic_languages,
                 )
             else:
                 resource_lang_subgroup = ""
             resource_languages += [(resource_lang_group, resource_lang_subgroup)]
-            buttons[lni+1] = st.checkbox(f"Add language {lni+2}")
-    resource_dict["languages"] = resource_languages
+            buttons_lang[lni+1] = st.checkbox(f"Add language {lni+2}")
+    resource_dict["languages"] = [(gr, ln) for gr, ln in resource_languages if gr != ""]
 
 with form_col.expander("Locations"):
-    resource_dict["resource_locations"] = st.text_input(
-        label="Where is the resource located?",
+    st.write("Location of the aggregated resource:")
+    resource_dict["resource_location"] = st.selectbox(
+        label="Where is the resource itself located or hosted?",
+        options=[''] + countries,
         help="E.g.: where is the **website hosted**, what is the physical **location of the library**, etc.?",
     )
-    resource_dict["language_locations"] = st.text_input(
-        label="Where are the language creators located?",
-        help="E.g.: where are the **people who write on the website** hosted, where are the **media managed by the library** from, etc.?",
-    )
+    st.write("Add all of the countries that have data creators represented in the resource (see 'Add country' checkbox)")
+    buttons_countries = [False for _ in range(MAX_COUNTRIES+1)]
+    buttons_countries[0] = True
+    for lni in range(MAX_COUNTRIES):
+        if buttons_countries[lni]:
+            lang_loc = st.selectbox(
+                label=f"Where are the language creators located? Country {lni+1}",
+                options=[''] + countries,
+                index = countries.index(resource_dict["resource_location"]) + 1 if lni == 0 and resource_dict["resource_location"] in countries else 0,
+                help="E.g.: where are the **people who write on the website** hosted, where are the **media managed by the library** from, etc.?",
+            )
+            buttons_countries[lni+1] = st.checkbox(f"Add country {lni+2}")
+            if lang_loc != "":
+                resource_dict["language_locations"] += [lang_loc]
 
 if resource_dict["type"] == "Processed dataset":
     form_col.markdown("#### Processed dataset availability")
