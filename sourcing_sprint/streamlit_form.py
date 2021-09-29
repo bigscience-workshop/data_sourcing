@@ -99,9 +99,7 @@ then fill out the form on the right.
 st.sidebar.markdown(description, unsafe_allow_html=True)
 
 with st.sidebar.form("submitter_information"):
-    submitter_name = st.text_input(
-        label="Name of submitter:"
-    )
+    submitter_name = st.text_input(label="Name of submitter:")
     submitter_email = st.text_input(
         label="Email (optional, enter if you are available to follow up on this catalogue entry):"
     )
@@ -128,76 +126,152 @@ form_col, _, display_col = st.columns([10, 1, 7])
 
 form_col.markdown("## New catalogue entry: input form\n --- \n")
 
-form_col.markdown("#### Name, ID, Homepage")
-resource_dict["name"] = form_col.text_input(
-    label=f"Provide a descriptive name for the resource",
-    help="This should be a human-readable name such as e.g. **Le Monde newspaper** (primary source), **EXAMS QA dataset** (processed dataset), or **Creative Commons** (partner organization)",
-)
-resource_dict["uid"] = form_col.text_input(
-    label=f"Provide a short `camel_case` unique identifier for the resource",
-    help="For example `le_monde_primary`, `exams_dataset`, or `creative_commons_org`",
-)
-resource_dict["homepage"]  = form_col.text_input(
-    label=f"If available, provide a link to the home page for the resource",
-    help="e.g. https://www.lemonde.fr/, https://github.com/mhardalov/exams-qa, or https://creativecommons.org/",
-)
-resource_dict["description"] = form_col.text_area(
-    label=f"Provide a short description of the resource",
-    help="Describe the resource in a few words to a few sentences, the description will be used to index and navigate the catalogue",
-)
+form_col.markdown("#### Name, ID, Homepage, Description")
+with form_col.expander("General information"):
+    resource_dict["name"] = st.text_input(
+        label=f"Provide a descriptive name for the resource",
+        help="This should be a human-readable name such as e.g. **Le Monde newspaper** (primary source), **EXAMS QA dataset** (processed dataset), or **Creative Commons** (partner organization)",
+    )
+    resource_dict["uid"] = st.text_input(
+        label=f"Provide a short `camel_case` unique identifier for the resource",
+        help="For example `le_monde_primary`, `exams_dataset`, or `creative_commons_org`",
+    )
+    resource_dict["homepage"] = st.text_input(
+        label=f"If available, provide a link to the home page for the resource",
+        help="e.g. https://www.lemonde.fr/, https://github.com/mhardalov/exams-qa, or https://creativecommons.org/",
+    )
+    resource_dict["description"] = st.text_area(
+        label=f"Provide a short description of the resource",
+        help="Describe the resource in a few words to a few sentences, the description will be used to index and navigate the catalogue",
+    )
 
 form_col.markdown("#### Languages and locations")
 
 with form_col.expander("Languages"):
     st.write("Add all of the languages that are covered by the resource (see 'Add language' checkbox)")
     resource_languages = []
-    buttons_lang = [False for _ in range(MAX_LANGS+1)]
+    buttons_lang = [False for _ in range(MAX_LANGS + 1)]
     buttons_lang[0] = True
     for lni in range(MAX_LANGS):
         if buttons_lang[lni]:
             resource_lang_group = st.selectbox(
                 label=f"Language (group) {lni+1}",
-                options=[''] + list(languages.keys()),
-                format_func=lambda x:languages.get(x, ''),
+                options=[""] + list(languages.keys()),
+                format_func=lambda x: languages.get(x, ""),
                 help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language",
             )
             if resource_lang_group == "Niger-Congo":
                 resource_lang_subgroup = st.selectbox(
                     label=f"Niger-Congo language {lni+1}",
-                    options=[''] + niger_congo_languages,
+                    options=[""] + niger_congo_languages,
                 )
             elif resource_lang_group == "Indic":
                 resource_lang_subgroup = st.selectbox(
                     label=f"Indic language {lni+1}",
-                    options=[''] + indic_languages,
+                    options=[""] + indic_languages,
                 )
             else:
                 resource_lang_subgroup = ""
             resource_languages += [(resource_lang_group, resource_lang_subgroup)]
-            buttons_lang[lni+1] = st.checkbox(f"Add language {lni+2}")
+            buttons_lang[lni + 1] = st.checkbox(f"Add language {lni+2}")
     resource_dict["languages"] = [(gr, ln) for gr, ln in resource_languages if gr != ""]
 
 with form_col.expander("Locations"):
     st.write("Location of the aggregated resource:")
     resource_dict["resource_location"] = st.selectbox(
         label="Where is the resource itself located or hosted?",
-        options=[''] + countries,
+        options=[""] + countries,
         help="E.g.: where is the **website hosted**, what is the physical **location of the library**, etc.?",
     )
-    st.write("Add all of the countries that have data creators represented in the resource (see 'Add country' checkbox)")
-    buttons_countries = [False for _ in range(MAX_COUNTRIES+1)]
+    st.write(
+        "Add all of the countries that have data creators represented in the resource (see 'Add country' checkbox)"
+    )
+    buttons_countries = [False for _ in range(MAX_COUNTRIES + 1)]
     buttons_countries[0] = True
     for lni in range(MAX_COUNTRIES):
         if buttons_countries[lni]:
             lang_loc = st.selectbox(
                 label=f"Where are the language creators located? Country {lni+1}",
-                options=[''] + countries,
-                index = countries.index(resource_dict["resource_location"]) + 1 if lni == 0 and resource_dict["resource_location"] in countries else 0,
+                options=[""] + countries,
+                index=countries.index(resource_dict["resource_location"]) + 1
+                if lni == 0 and resource_dict["resource_location"] in countries
+                else 0,
                 help="E.g.: where are the **people who write on the website** hosted, where are the **media managed by the library** from, etc.?",
             )
-            buttons_countries[lni+1] = st.checkbox(f"Add country {lni+2}")
+            buttons_countries[lni + 1] = st.checkbox(f"Add country {lni+2}")
             if lang_loc != "":
                 resource_dict["language_locations"] += [lang_loc]
+
+primary_taxonomy = {
+    "website": [
+        "social media",
+        "forum",
+        "news or magazine website",
+        "wiki",
+        "blog",
+        "official website",
+        "content repository, archive, or collection",
+        "other",
+    ],
+    "collection": [
+        "books/book publisher",
+        "scientific articles/journal",
+        "newspaper",
+        "radio",
+        "videos",
+        "podcasts",
+        "other",
+    ],
+    "other": [],
+}
+
+if resource_dict["type"] == "Primary source":
+    form_col.markdown("#### Primary source availability")
+    with form_col.expander("Obtaining the data: online availability and owner/provider"):
+        st.write("TODO: How to download/obtain")
+        st.write("TODO: if downloadable, provide URL")
+        st.write("TODO: Who owns the data - follow up")
+    with form_col.expander("Data licenses and Terms of Service"):
+        st.write("TODO: Choose license from options")
+        st.write("TODO: Copy license and TOS to text area")
+    with form_col.expander("Personal Identifying Information"):
+        st.write("TODO: Risk of PII - category and justificaction (cat + string)")
+    form_col.markdown("#### Primary source type")
+    with form_col.expander("Source category"):
+        primary_tax_top = st.radio(
+            label="Is the resource best described as a:",
+            options=["collection", "website", "other"],
+        )
+        if primary_tax_top == "website":
+            primary_tax_web = st.selectbox(
+                label="What kind of website?",
+                options=[""] + primary_taxonomy["website"],
+            )
+        else:
+            primary_tax_web = ""
+        if primary_tax_top == "collection" or "collection" in primary_tax_web:
+            primary_tax_col = st.selectbox(
+                label="What kind of collection?",
+                options=[""] + primary_taxonomy["collection"],
+            )
+        else:
+            primary_tax_col = ""
+        if primary_tax_top == "other":
+            primary_tax_top = st.text_input(
+                label="You entered `other` for the resource type, how would you categorize it?",
+            )
+        if primary_tax_web == "other":
+            primary_tax_web = st.text_input(
+                label="You entered `other` for the type of website, how would you categorize it?",
+            )
+        if primary_tax_col == "other":
+            primary_tax_col = st.text_input(
+                label="You entered `other` for the type of collection, how would you categorize it?",
+            )
+        resource_dict["primary_type"] = (primary_tax_top, primary_tax_web, primary_tax_col)
+    form_col.markdown("#### Media type, format, size, and processing needs")
+    with form_col.expander("Media information"):
+        st.write("TODO: amount of data - list of formats and expected processing needs")
 
 if resource_dict["type"] == "Processed dataset":
     form_col.markdown("#### Processed dataset availability")
@@ -205,14 +279,11 @@ if resource_dict["type"] == "Processed dataset":
     form_col.markdown("#### Primary sources of processed dataset")
     form_col.write("TODO: list and either link OR fill out relevant information")
 
-if resource_dict["type"] == "Primary source":
-    form_col.markdown("#### Primary source availability")
-    form_col.write("TODO: how to obtain, license, personal information, will you do it")
-    form_col.markdown("#### Primary source type")
-    form_col.write("TODO: taxonomy - website/published work/collection")
-    form_col.markdown("#### Media type and format")
-    form_col.write("TODO: list of formats and expected processing needs")
-
 display_col.markdown("## New catalogue entry: save output\n --- \n")
+display_col.download_button(
+    label="Download output as `json`",
+    data=json.dumps(resource_dict, indent=2),
+    file_name="resource_entry.json" if resource_dict['uid'] == '' else f"{resource_dict['uid']}_entry.json"
+)
 display_col.markdown(f"You are entering a new resource of type: *{resource_dict['type']}*")
 display_col.write(resource_dict)
