@@ -4,13 +4,14 @@ import streamlit as st
 ##################
 ## resources
 ##################
+
+### Countries and languages
 # from Wikipedia and https://unstats.un.org/unsd/methodology/m49/
 regions, countries, region_tree = json.load(open("unstats_regions_countries.json", encoding="utf-8"))
-
 languages = {
     "Arabic": "Arabic",
     "Basque": "Basque",
-    "Catalan": "Spanish: Catalan",
+    "Catalan": "Catalan",
     "Chinese": "Chinese",
     "English": "English",
     "French": "French",
@@ -18,7 +19,7 @@ languages = {
     "Indonesian": "Indonesian",
     "Niger-Congo": "African languages of the Niger-Congo family, incl. Bantu languages",
     "Portuguese": "Portuguese",
-    "Spanish": "Spanish: Castillan",
+    "Spanish": "Castillan",
     "Vietnamese": "Vietnamese",
 }
 # https://meta.wikimedia.org/wiki/African_languages
@@ -65,6 +66,30 @@ indic_languages = [
 MAX_LANGS = 25
 MAX_COUNTRIES = 25
 
+### Primary source categories
+primary_taxonomy = {
+    "website": [
+        "social media",
+        "forum",
+        "news or magazine website",
+        "wiki",
+        "blog",
+        "official website",
+        "content repository, archive, or collection",
+        "other",
+    ],
+    "collection": [
+        "books/book publisher",
+        "scientific articles/journal",
+        "newspaper",
+        "radio",
+        "videos",
+        "podcasts",
+        "other",
+    ],
+    "other": [],
+}
+
 resource_dict = {
     "type": "",
     "name": "",
@@ -103,7 +128,7 @@ with st.sidebar.form("submitter_information"):
     submitter_email = st.text_input(
         label="Email (optional, enter if you are available to follow up on this catalogue entry):"
     )
-    submitted_info = st.form_submit_button("Submit")
+    submitted_info = st.form_submit_button("Submit self information")
 
 st.sidebar.markdown("### Resource type")
 resource_type_help = """
@@ -156,10 +181,14 @@ with form_col.expander("Languages"):
         if buttons_lang[lni]:
             resource_lang_group = st.selectbox(
                 label=f"Language (group) {lni+1}",
-                options=[""] + list(languages.keys()),
+                options=[""] + list(languages.keys()) + ["other"],
                 format_func=lambda x: languages.get(x, ""),
                 help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language",
             )
+            if resource_lang_group == "other":
+                resource_lang_group = st.text_input(
+                    label="Please enter the name of the language you are adding the resource for:"
+                )
             if resource_lang_group == "Niger-Congo":
                 resource_lang_subgroup = st.selectbox(
                     label=f"Niger-Congo language {lni+1}",
@@ -179,13 +208,11 @@ with form_col.expander("Languages"):
 with form_col.expander("Locations"):
     st.write("Location of the aggregated resource:")
     resource_dict["resource_location"] = st.selectbox(
-        label="Where is the resource itself located or hosted?",
+        label="Where is the resource or organization itself located or hosted?",
         options=[""] + countries,
         help="E.g.: where is the **website hosted**, what is the physical **location of the library**, etc.?",
     )
-    st.write(
-        "Add all of the countries that have data creators represented in the resource (see 'Add country' checkbox)"
-    )
+    st.write("Add all of the countries that have data creators represented in/by the resource/organization")
     buttons_countries = [False for _ in range(MAX_COUNTRIES + 1)]
     buttons_countries[0] = True
     for lni in range(MAX_COUNTRIES):
@@ -202,28 +229,6 @@ with form_col.expander("Locations"):
             if lang_loc != "":
                 resource_dict["language_locations"] += [lang_loc]
 
-primary_taxonomy = {
-    "website": [
-        "social media",
-        "forum",
-        "news or magazine website",
-        "wiki",
-        "blog",
-        "official website",
-        "content repository, archive, or collection",
-        "other",
-    ],
-    "collection": [
-        "books/book publisher",
-        "scientific articles/journal",
-        "newspaper",
-        "radio",
-        "videos",
-        "podcasts",
-        "other",
-    ],
-    "other": [],
-}
 
 if resource_dict["type"] == "Primary source":
     form_col.markdown("#### Primary source availability")
@@ -270,20 +275,91 @@ if resource_dict["type"] == "Primary source":
             )
         resource_dict["primary_type"] = (primary_tax_top, primary_tax_web, primary_tax_col)
     form_col.markdown("#### Media type, format, size, and processing needs")
-    with form_col.expander("Media information"):
-        st.write("TODO: amount of data - list of formats and expected processing needs")
+    with form_col.expander("Media type"):
+        st.write("Please provide information about the format of the language data")
+        media_type = {}
+        primary_media = st.radio(
+            label="The language data in the resource is primarily:",
+            options=["text", "audiovisual", "image"],
+            help="Media data provided with transcription should go into **text**, then select the *transcribed* option. PDFs that have pre-extracted text information should go into **text**, PDFs that need OCR should go into **images**, select the latter if you're unsure",
+        )
+        media_type["category"] = primary_media
+        if primary_media == "text":
+            primary_media_text = st.selectbox(
+                label="What is the format of the text?",
+                options=["", "plain text", "HTML", "PDF", "XML", "mediawiki", "other"],
+            )
+            if primary_media_text == "other":
+                primary_media_text = st.text_input(
+                    label="You entered `other` for the text format, what format is it?",
+                )
+            media_type["text_format"] = primary_media_text
+            primary_media_transcribed = st.radio(
+                label="Was the text transcribed from another media format (e.g. audio or image)",
+                options=["No", "Yes - audiovisual", "Yes - image"],
+            )
+            if primary_media_transcribed != "No":
+                primary_media_transcribed_available = st.radio(
+                    label="Are the source media available at the same location?", options=["Unavailable", "Available"]
+                )
+                primary_media_transcribed_mode = st.radio(
+                    label="How was the transcription obtained?", options=["Unknown", "Manually", "Automatically"]
+                )
+            else:
+                primary_media_transcribed_available = ""
+                primary_media_transcribed_mode = ""
+            media_type["is_transcribed"] = (
+                primary_media_transcribed,
+                primary_media_transcribed_available,
+                primary_media_transcribed_mode,
+            )
+        if primary_media == "audiovisual" or (
+            primary_media == "text"
+            and primary_media_transcribed_available == "Available"
+            and "audiovisual" in primary_media_transcribed
+        ):
+            primary_media_audiovisual = st.selectbox(
+                label="What is the format of the audiovisual data?",
+                options=["", "mp4", "wav", "video", "other"],
+            )
+            if primary_media_audiovisual == "other":
+                primary_media_audiovisual = st.text_input(
+                    label="You entered `other` for the audiovisual format, what format is it?",
+                )
+            media_type["audiovisual_format"] = primary_media_audiovisual
+        if primary_media == "image" or (
+            primary_media == "text"
+            and primary_media_transcribed_available == "Available"
+            and "image" in primary_media_transcribed
+        ):
+            primary_media_image = st.selectbox(
+                label="What is the format of the image data?",
+                options=["", "JPEG", "PNG", "PDF", "TIFF", "other"],
+            )
+            if primary_media_image == "other":
+                primary_media_image = st.text_input(
+                    label="You entered `other` for the image format, what format is it?",
+                )
+            media_type["image_format"] = primary_media_image
+        resource_dict["primary_media_type"] = media_type
+    with form_col.expander("Media amounts"):
+        st.write(
+            "TODO: amount of data - list of number of items, what an item is, and expected number of words per item"
+        )
 
 if resource_dict["type"] == "Processed dataset":
     form_col.markdown("#### Processed dataset availability")
-    form_col.write("TODO: how to obtain, license, personal information, will you do it")
+    with form_col.expander("Obtaining the data: online availability and owner/provider"):
+        st.write("TODO: how to obtain, license, personal information, will you do it")
     form_col.markdown("#### Primary sources of processed dataset")
-    form_col.write("TODO: list and either link OR fill out relevant information")
+    with form_col.expander("List primary sources"):
+        form_col.write("TODO: list and either link OR fill out relevant information")
 
 display_col.markdown("## New catalogue entry: save output\n --- \n")
 display_col.download_button(
     label="Download output as `json`",
     data=json.dumps(resource_dict, indent=2),
-    file_name="resource_entry.json" if resource_dict['uid'] == '' else f"{resource_dict['uid']}_entry.json"
+    file_name="resource_entry.json" if resource_dict["uid"] == "" else f"{resource_dict['uid']}_entry.json",
 )
 display_col.markdown(f"You are entering a new resource of type: *{resource_dict['type']}*")
 display_col.write(resource_dict)
