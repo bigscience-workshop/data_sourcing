@@ -1,5 +1,68 @@
 import streamlit as st
 
+##################
+## resources
+##################
+languages = {
+    "Arabic": "Arabic",
+    "Basque": "Basque",
+    "Catalan": "Spanish: Catalan",
+    "Chinese": "Chinese",
+    "English": "English",
+    "French": "French",
+    "Indic": "Indic languages, incl. Bengali, Hindi, Urdu...",
+    "Indonesian": "Indonesian",
+    "Niger-Congo": "African languages of the Niger-Congo family, incl. Bantu languages",
+    "Portuguese": "Portuguese",
+    "Spanish": "Spanish: Castillan",
+    "Vietnamese": "Vietnamese",
+}
+# https://meta.wikimedia.org/wiki/African_languages
+niger_congo_languages = [
+    "Akan",
+    "Bambara",
+    "Chi Chewa",
+    "ChiShona",
+    "ChiTumbuka",
+    "Fon",
+    "Igbo",
+    "isiZulu",
+    "Kinyarwanda",
+    "Kikongo",
+    "Kikuyu",
+    "Kirundi",
+    "Lingala",
+    "Luganda",
+    "Northern Sotho",
+    "Sesotho",
+    "Setswana",
+    "Swahili",
+    "Twi",
+    "Wolof",
+    "Xhosa",
+    "Xitsonga",
+    "Yoruba",
+]
+# TODO: add more
+indic_languages = [
+    "Assamese",
+    "Bengali",
+    "Gujarati",
+    "Hindi",
+    "Kannada",
+    "Malayalam",
+    "Marathi",
+    "Odia",
+    "Punjabi",
+    "Telugu",
+    "Tamil",
+    "Urdu",
+]
+MAX_LANGS = 10
+
+##################
+## streamlit
+##################
 st.set_page_config(
     page_title="BigSCience Language Resource Catalogue Input Form",
     page_icon="https://avatars.githubusercontent.com/u/82455566",
@@ -67,95 +130,43 @@ resource_homepage  = form_col.text_area(
     help="Describe the resource in a few words to a few sentences, the description will be used to index and navigate the catalogue",
 )
 
-form_col.markdown("#### Language and location")
-resource_is_multilingual = form_col.radio(
-    label="Does the resource cover several languages?",
-    options=["Yes", "No"],
-    index=1,
-)
-if resource_is_multilingual == "Yes":
-    lang_number = form_col.number_input(
-        label="How many languages does the resource cover?",
-        min_value=2,
-        value=2,
-    )
-else:
-    lang_number = 1
+form_col.markdown("#### Languages and locations")
 
-languages = {
-    "Arabic": "Arabic",
-    "Basque": "Basque",
-    "Catalan": "Spanish: Catalan",
-    "Chinese": "Chinese",
-    "English": "English",
-    "French": "French",
-    "Indic": "Indic languages, incl. Bengali, Hindi, Urdu...",
-    "Indonesian": "Indonesian",
-    "Niger-Congo": "African languages of the Niger-Congo family, incl. Bantu languages",
-    "Portuguese": "Portuguese",
-    "Spanish": "Spanish: Castillan",
-    "Vietnamese": "Vietnamese",
-}
-# https://meta.wikimedia.org/wiki/African_languages
-niger_congo_languages = [
-    "Akan",
-    "Bambara",
-    "Chi Chewa",
-    "ChiShona",
-    "ChiTumbuka",
-    "Fon",
-    "Igbo",
-    "isiZulu",
-    "Kinyarwanda",
-    "Kikongo",
-    "Kikuyu",
-    "Kirundi",
-    "Lingala",
-    "Luganda",
-    "Northern Sotho",
-    "Sesotho",
-    "Setswana",
-    "Swahili",
-    "Twi",
-    "Wolof",
-    "Xhosa",
-    "Xitsonga",
-    "Yoruba",
-]
-# TODO: add more
-indic_languages = [
-    "Assamese",
-    "Bengali",
-    "Gujarati",
-    "Hindi",
-    "Kannada",
-    "Malayalam",
-    "Marathi",
-    "Odia",
-    "Punjabi",
-    "Telugu",
-    "Tamil",
-    "Urdu",
-]
-resource_languages = []
-for lni in range(lang_number):
-    resource_lang_group = form_col.selectbox(
-        label=f"Language (group) {lni+1}",
-        options=languages,
+with form_col.expander("Languages"):
+    st.write("Add all of the languages that are covered by the resource (see 'Add language' checkbox)")
+    resource_languages = []
+    buttons = [False for _ in range(MAX_LANGS+1)]
+    buttons[0] = True
+    for lni in range(MAX_LANGS):
+        if buttons[lni]:
+            resource_lang_group = st.selectbox(
+                label=f"Language (group) {lni+1}",
+                options=languages,
+            )
+            if resource_lang_group == "Niger-Congo":
+                resource_lang_subgroup = st.selectbox(
+                    label=f"Niger-Congo language {lni+1}",
+                    options=niger_congo_languages,
+                )
+            elif resource_lang_group == "Indic":
+                resource_lang_subgroup = st.selectbox(
+                    label=f"Indic language {lni+1}",
+                    options=indic_languages,
+                )
+            else:
+                resource_lang_subgroup = ""
+            resource_languages += [(resource_lang_group, resource_lang_subgroup)]
+            buttons[lni+1] = st.checkbox(f"Add language {lni+2}")
+
+with form_col.expander("Locations"):
+    resource_loc = st.text_input(
+        label="Where is the resource located?",
+        help="E.g.: where is the *website* hosted, what is the physical *location of the library*, etc.?",
     )
-    if resource_lang_group == "Niger-Congo":
-        resource_lang_subgroup = form_col.selectbox(
-            label=f"Niger-Congo language {lni+1}",
-            options=niger_congo_languages,
-        )
-    elif resource_lang_group == "Indic":
-        resource_lang_subgroup = form_col.selectbox(
-            label=f"Indic language {lni+1}",
-            options=indic_languages,
-        )
-    else:
-        resource_lang_subgroup = ""
-    resource_languages += [(resource_lang_group, resource_lang_subgroup)]
+    language_loc = st.text_input(
+        label="Where are the language creators located?",
+        help="E.g.: where are the *people who write* on the website hosted, where are the *media managed by the library* from, etc.?",
+    )
 
 
 if resource_type == "Processed dataset":
