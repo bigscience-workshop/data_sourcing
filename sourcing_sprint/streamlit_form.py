@@ -315,7 +315,7 @@ if resource_dict["type"] == "Primary source":
             label="Please enter the name of the entity that manages the data:"
         )
         resource_dict["owner_email"] = st.text_input(
-            label="If available, please enter an email adress that can be used to ask them about using/obtaining the data:"
+            label="If available, please enter an email address that can be used to ask them about using/obtaining the data:"
         )
         resource_dict["owner_contact_submitter"] = st.radio(
             label="Would you be willing to reach out to the entity to ask them about using their data (with support from the BigScience data sourcing team)? If so, make sure to fill out your email information in the left sidebar.",
@@ -502,12 +502,159 @@ if resource_dict["type"] == "Primary source":
 
 if resource_dict["type"] == "Processed dataset":
     form_col.markdown("### Processed dataset availability")
-    with form_col.expander("Obtaining the data: online availability and owner/provider"):
-        st.write("TODO: how to obtain, license, personal information, will you do it")
+    with form_col.expander("Obtaining the data: online availability and data owner/custodian"):
+        st.markdown("---\n#### Availability for download")
+        resource_dict["available_for_download"] = st.radio(
+            label="Can the data be obtained online?",
+            options=[
+                "Yes - it has a direct download link or links",
+                "Yes - after signing a user agreement",
+                "No - but the current owners/custodians have contact information for data queries",
+                "No - we would need to spontaneously reach out to the current owners/custodians"
+            ],
+        )
+        if "Yes -" in resource_dict["available_for_download"]:
+            resource_dict["download_url"] = st.text_input(
+                label="Please provide the URL where the data can be downloaded",
+                help="If the data source is a website or collection of files, please provided the top-level URL or location of the file directory",
+            )
+        st.markdown("---\n#### Information about the data owners/custodians")
+        resource_dict["owner_type"] = st.selectbox(
+            label="Is the data owned or managed by:",
+            options=[
+                "",
+                "A commercial entity",
+                "A library, museum, or archival institute",
+                "A nonprofit/NGO (other)",
+                "A government organization",
+                "A private individual",
+                "Unclear",
+                "other",
+            ],
+        )
+        if resource_dict["owner_type"] == "other":
+            resource_dict["owner_type"] = st.text_input(
+                label="You entered `other` for the data owner/custodian, how would you categorize them?",
+            )
+        resource_dict["owner_name"] = st.text_input(
+            label="Please enter the name of the entity that manages the data:"
+        )
+        resource_dict["owner_email"] = st.text_input(
+            label="If available, please enter an email address that can be used to ask them about using/obtaining the data:"
+        )
+        resource_dict["owner_contact_submitter"] = st.radio(
+            label="Would you be willing to reach out to the entity to ask them about using their data (with support from the BigScience data sourcing team)? If so, make sure to fill out your email information in the left sidebar.",
+            options=["Yes", "No"],
+            index=1,
+        )
+        resource_dict["owner_additional"] = st.text_input(
+            label="Where can we find more information about the data owner/custodian? Please provide a URL",
+            help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists."
+        )
+
+    with form_col.expander("Data licenses and Terms of Service"):
+        resource_dict["resource_licenses"] = []
+        st.write("Please provide as much information as you can find about the data's licensing and terms of use:")
+        resource_dict["has_licenses"] = st.radio(
+            label="Does the language data in the resource come with explicit licenses of terms of use?",
+            options=["Yes", "No", "Unclear"],
+        )
+        st.markdown("---\n")
+        if resource_dict["has_licenses"] == "Yes":
+            resource_dict["license_description"] = st.text_area(
+                label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
+                help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
+            )
+            st.markdown("If the language data is shared under established licenses (such as e.g. **MIT license** or **CC-BY-3.0**), please select all that apply below (use the `Add license n` checkbox below if more than one):")
+            buttons_licenses = [False for _ in range(MAX_LICENSES + 1)]
+            buttons_licenses[0] = True
+            for lni in range(MAX_LICENSES):
+                if buttons_licenses[lni]:
+                    license = st.selectbox(
+                        label=f"Under which license is the data shared? License {lni+1}",
+                        options=[""] + licenses,
+                        help="E.g.: Is the data shared under a CC or MIT license?",
+                    )
+                    buttons_licenses[lni + 1] = st.checkbox(f"Add license {lni+2}")
+                    if license != "":
+                        resource_dict["resource_licenses"] += [license]
+        else:
+            st.write("TODO: what do we do for nonexistent or unclear licenses?")
+
+    with form_col.expander("Personal Identifying Information"):
+        resource_dict["resource_pii"] = []
+        st.write("Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:")
+        resource_dict["has_pii"] = st.radio(
+            label="Does the language data in the resource contain personally identifiable or sensitive information?",
+            help="See the guide for descriptions and examples. The default answer should be 'Yes'. Answers of 'No' and 'Unclear' require justifications.",
+            options=["Yes", "No", "Unclear"],
+        )
+        st.markdown("---\n")
+        if resource_dict["has_pii"] == "Yes":
+            st.markdown("If the resource does contain personally identifiable or sensitive information, please select what types:")
+            buttons_pii = [False for _ in range(MAX_PII + 1)]
+            buttons_pii[0] = True
+            for lni in range(MAX_PII):
+                if buttons_pii[lni]:
+                    pii = st.selectbox(
+                        label=f"What type(s) of PII does the resource contain? Type {lni+1}",
+                        options=[""] + pii_categories + sensitive_categories,
+                        help="E.g.: Does the resource contain names, birth dates, or personal life details?",
+                    )
+                    buttons_pii[lni + 1] = st.checkbox(f"Add PII Type {lni+2}")
+                    if pii != "":
+                        resource_dict["resource_pii"] += [pii]
+        else:
+            resource_dict["pii_justification"] = st.radio(
+                label="What is the justification for this resource possibly not having personally identifiable or sensitive content?",
+                options=["general knowledge not written by or referring to private persons", "fictional text", "other"],
+            )
+            if resource_dict["pii_justification"] == "other":
+                resource_dict["pii_justification"] = st.text_area(
+                    label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
+                    help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
+                )
 
     form_col.markdown("### Primary sources of processed dataset")
     with form_col.expander("List primary sources"):
         form_col.write("TODO: list and either link OR fill out relevant information")
+       
+if resource_dict["type"] == "Partner organization":
+    form_col.markdown("### Partner Information")
+    with form_col.expander("Data owner/custodian"):
+        st.markdown("#### Information about the data owners/custodians")
+        resource_dict["owner_type"] = st.selectbox(
+            label="Is the data owner/custodian:",
+            options=[
+                "",
+                "A commercial entity",
+                "A library, museum, or archival institute",
+                "A nonprofit/NGO (other)",
+                "A government organization",
+                "A private individual",
+                "Unclear",
+                "other",
+            ],
+        )
+        if resource_dict["owner_type"] == "other":
+            resource_dict["owner_type"] = st.text_input(
+                label="You entered `other` for the data owner/custodian, how would you categorize them?",
+            )
+        resource_dict["owner_name"] = st.text_input(
+            label="Please enter the name of the entity:"
+        )
+        resource_dict["owner_email"] = st.text_input(
+            label="If available, please enter an email address that can be used to ask them about using/obtaining their data:"
+        )
+        resource_dict["owner_contact_submitter"] = st.radio(
+            label="Would you be willing to reach out to the entity to ask them about using their data (with support from the BigScience data sourcing team)? If so, make sure to fill out your email information in the left sidebar.",
+            options=["Yes", "No"],
+            index=1,
+        )
+        resource_dict["owner_additional"] = st.text_input(
+            label="Where can we find more information about the data owner/custodian? Please provide a URL",
+            help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists."
+        )
 
 display_col.markdown("## New catalogue entry: save output\n --- \n")
 display_col.download_button(
