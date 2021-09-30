@@ -128,6 +128,8 @@ This form can be used to add a new entry to the BigScience Data Sourcing Catalog
 To do so, please add your name, email (optional), the type of resource you would like to add,
 then fill out the form on the right.
 
+For more information: [**guide to adding a new catalogue entry.**](https://github.com/bigscience-workshop/data_sourcing/blob/master/sourcing_sprint/guide.md#guide-to-submitting-sources-to-the-bigscience-data-sourcing-hackathon)
+
 ### Submitter information
 """
 st.sidebar.markdown(description, unsafe_allow_html=True)
@@ -160,7 +162,7 @@ form_col, _, display_col = st.columns([10, 1, 7])
 
 form_col.markdown("## New catalogue entry: input form\n --- \n")
 
-form_col.markdown("#### Name, ID, Homepage, Description")
+form_col.markdown("### Name, ID, Homepage, Description")
 with form_col.expander("General information"):
     resource_dict["name"] = st.text_input(
         label=f"Provide a descriptive name for the resource",
@@ -179,7 +181,7 @@ with form_col.expander("General information"):
         help="Describe the resource in a few words to a few sentences, the description will be used to index and navigate the catalogue",
     )
 
-form_col.markdown("#### Languages and locations")
+form_col.markdown("### Languages and locations")
 
 with form_col.expander("Languages"):
     st.write("Add all of the languages that are covered by the resource (see 'Add language' checkbox)")
@@ -241,9 +243,9 @@ with form_col.expander("Locations"):
                 resource_dict["language_locations"] += [lang_loc]
 
 if resource_dict["type"] == "Primary source":
-    form_col.markdown("#### Primary source availability")
+    form_col.markdown("### Primary source availability")
     with form_col.expander("Obtaining the data: online availability and data owner/custodian"):
-        st.markdown("---\n##### Availability for download")
+        st.markdown("---\n#### Availability for download")
         resource_dict["available_for_download"] = st.radio(
             label="Can the data be obtained online?",
             options=[
@@ -258,7 +260,7 @@ if resource_dict["type"] == "Primary source":
                 label="Please provide the URL where the data can be downloaded",
                 help="If the data source is a website or collection of files, please provided the top-level URL or location of the file directory",
             )
-        st.markdown("---\n##### Information about the data owners/custodians")
+        st.markdown("---\n#### Information about the data owners/custodians")
         resource_dict["owner_type"] = st.selectbox(
             label="Is the data owned or managed by:",
             options=[
@@ -324,7 +326,7 @@ if resource_dict["type"] == "Primary source":
     with form_col.expander("Personal Identifying Information"):
         st.write("TODO: Risk of PII - category and justificaction (cat + string)")
 
-    form_col.markdown("#### Primary source type")
+    form_col.markdown("### Primary source type")
     with form_col.expander("Source category"):
         primary_tax_top = st.radio(
             label="Is the resource best described as a:",
@@ -358,7 +360,7 @@ if resource_dict["type"] == "Primary source":
             )
         resource_dict["primary_source_type"] = (primary_tax_top, primary_tax_web, primary_tax_col)
 
-    form_col.markdown("#### Media type, format, size, and processing needs")
+    form_col.markdown("### Media type, format, size, and processing needs")
     with form_col.expander("Media type"):
         st.write("Please provide information about the format of the language data")
         media_type = {}
@@ -434,11 +436,11 @@ if resource_dict["type"] == "Primary source":
         )
 
 if resource_dict["type"] == "Processed dataset":
-    form_col.markdown("#### Processed dataset availability")
+    form_col.markdown("### Processed dataset availability")
     with form_col.expander("Obtaining the data: online availability and owner/provider"):
         st.write("TODO: how to obtain, license, personal information, will you do it")
 
-    form_col.markdown("#### Primary sources of processed dataset")
+    form_col.markdown("### Primary sources of processed dataset")
     with form_col.expander("List primary sources"):
         form_col.write("TODO: list and either link OR fill out relevant information")
 
