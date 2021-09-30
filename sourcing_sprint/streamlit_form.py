@@ -102,6 +102,8 @@ resource_dict = {
     "language_locations": [],
 }
 
+licenses = json.load(open("licenses.json", encoding="utf-8"))
+MAX_LICENSES = 25
 ##################
 ## streamlit
 ##################
@@ -237,9 +239,32 @@ if resource_dict["type"] == "Primary source":
         st.write("TODO: How to download/obtain")
         st.write("TODO: if downloadable, provide URL")
         st.write("TODO: Who owns the data - follow up")
+        
     with form_col.expander("Data licenses and Terms of Service"):
-        st.write("TODO: Choose license from options")
-        st.write("TODO: Copy license and TOS to text area")
+        st.write("Add each license that the primary source is shared under, if applicable.")
+        resource_dict["resource_license"] = None
+        buttons_licenses = [False for _ in range(MAX_LICENSES + 1)]
+        buttons_licenses[0] = True
+        for lni in range(MAX_LICENSES):
+            if buttons_licenses[lni]:
+                license = st.selectbox(
+                    label=f"Under which license is the data shared? License {lni+1}",
+                    options=[""] + licenses,
+                    index=licenses.index(resource_dict["resource_license"]) + 1
+                    if lni == 0 and resource_dict["resource_license"] in licenses
+                    else 0,
+                    help="E.g.: Is the data shared under a CC or MIT license?",
+                )
+                buttons_licenses[lni + 1] = st.checkbox(f"Add license {lni+2}")
+                if license != "":
+                    resource_dict["resource_licenses"] += [license]
+                
+        st.write("Copy the license and/or Terms of Service text here.")
+        resource_dict["license_description"] = st.text_area(
+            label=f"Provide the text for the license or terms of service for the resource",
+            help="The text may be included in a link to the license webpage.",
+    )
+    
     with form_col.expander("Personal Identifying Information"):
         st.write("TODO: Risk of PII - category and justificaction (cat + string)")
     form_col.markdown("#### Primary source type")
