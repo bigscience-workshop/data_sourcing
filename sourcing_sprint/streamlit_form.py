@@ -26,7 +26,7 @@ languages = {
     "Portuguese": "Portuguese",
     "Spanish": "Spanish",
     "Vietnamese": "Vietnamese",
-    "Other": "Other languages",
+    "other": "Other",
 }
 # https://meta.wikimedia.org/wiki/African_languages
 niger_congo_languages = [
@@ -191,12 +191,12 @@ with form_col.expander("Languages"):
                 label=f"Language (group) {lni+1}",
                 options=[""] + list(languages.keys()),
                 format_func=lambda x: languages.get(x, ""),
-                help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language",
+                help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language. If you cannot find the language in either the top-level or lower-level menus, select `Other` to search in a more extensive list.",
             )
-            if resource_lang_group == "Other":
+            if resource_lang_group == "other":
                 resource_lang_group = st.selectbox(
                     label=f"Language (group) {lni+1}",
-                    options= [', '.join(x['description']) for x in bcp_47_langs],
+                    options= [''] + [', '.join(x['description']) for x in bcp_47_langs],
                     help="This is a comprehensive list of Languages, please select one using the search function",
                 )
             if resource_lang_group == "Niger-Congo":
@@ -246,32 +246,34 @@ if resource_dict["type"] == "Primary source":
         st.write("TODO: How to download/obtain")
         st.write("TODO: if downloadable, provide URL")
         st.write("TODO: Who owns the data - follow up")
-        
+
     with form_col.expander("Data licenses and Terms of Service"):
-        st.write("Add each license that the primary source is shared under, if applicable.")
-        resource_dict["resource_license"] = None
-        buttons_licenses = [False for _ in range(MAX_LICENSES + 1)]
-        buttons_licenses[0] = True
-        for lni in range(MAX_LICENSES):
-            if buttons_licenses[lni]:
-                license = st.selectbox(
-                    label=f"Under which license is the data shared? License {lni+1}",
-                    options=[""] + licenses,
-                    index=licenses.index(resource_dict["resource_license"]) + 1
-                    if lni == 0 and resource_dict["resource_license"] in licenses
-                    else 0,
-                    help="E.g.: Is the data shared under a CC or MIT license?",
-                )
-                buttons_licenses[lni + 1] = st.checkbox(f"Add license {lni+2}")
-                if license != "":
-                    resource_dict["resource_licenses"] += [license]
-                
-        st.write("Copy the license and/or Terms of Service text here.")
-        resource_dict["license_description"] = st.text_area(
-            label=f"Provide the text for the license or terms of service for the resource",
-            help="The text may be included in a link to the license webpage.",
-    )
-    
+        resource_dict["resource_licenses"] = []
+        st.write("Please provide as much information as you can find about the licensing and possible use restrictions for the language data.")
+        resource_dict["has_licenses"] = st.radio(
+            label="Does the language data in the resource come with explicit licenses of terms of use?",
+            options=["Yes", "No", "Unclear"],
+        )
+        st.markdown("---\n")
+        if resource_dict["has_licenses"] == "Yes":
+            resource_dict["license_description"] = st.text_area(
+                label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
+                help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
+            )
+            st.markdown("If the language data is shared under established licenses (such as e.g. **MIT license** or **CC-BY-3.0**), please select all that apply below (use the `Add license n` checkbox below if more than one):")
+            buttons_licenses = [False for _ in range(MAX_LICENSES + 1)]
+            buttons_licenses[0] = True
+            for lni in range(MAX_LICENSES):
+                if buttons_licenses[lni]:
+                    license = st.selectbox(
+                        label=f"Under which license is the data shared? License {lni+1}",
+                        options=[""] + licenses,
+                        help="E.g.: Is the data shared under a CC or MIT license?",
+                    )
+                    buttons_licenses[lni + 1] = st.checkbox(f"Add license {lni+2}")
+                    if license != "":
+                        resource_dict["resource_licenses"] += [license]
+
     with form_col.expander("Personal Identifying Information"):
         st.write("TODO: Risk of PII - category and justificaction (cat + string)")
     form_col.markdown("#### Primary source type")
