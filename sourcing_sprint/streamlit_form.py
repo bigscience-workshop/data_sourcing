@@ -147,7 +147,7 @@ MAX_LICENSES = 25
 ## streamlit
 ##################
 st.set_page_config(
-    page_title="BigSCience Language Resource Catalogue Input Form",
+    page_title="BigScience Language Resource Catalogue Input Form",
     page_icon="https://avatars.githubusercontent.com/u/82455566",
     layout="wide",
     initial_sidebar_state="auto",
@@ -358,15 +358,15 @@ if resource_dict["type"] == "Primary source":
 
     with form_col.expander("Personal Identifying Information"):
         #st.write("TODO: Risk of PII - category and justificaction (cat + string)")
-        resource_dict["resource_pii"] = []
+        resource_pii = {}
         st.write("Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:")
-        resource_dict["has_pii"] = st.radio(
+        resource_pii["has_pii"] = st.radio(
             label="Does the language data in the resource contain personally identifiable or sensitive information?",
             help="See the guide for descriptions and examples. The default answer should be 'Yes'. Answers of 'No' and 'Unclear' require justifications.",
             options=["Yes", "No", "Unclear"],
         )
         st.markdown("---\n")
-        if resource_dict["has_pii"] == "Yes":
+        if resource_pii["has_pii"] == "Yes":
             st.markdown("If the resource does contain personally identifiable or sensitive information, please select what types:")
             buttons_pii = [False for _ in range(MAX_PII + 1)]
             buttons_pii[0] = True
@@ -379,17 +379,19 @@ if resource_dict["type"] == "Primary source":
                     )
                     buttons_pii[lni + 1] = st.checkbox(f"Add PII Type {lni+2}")
                     if pii != "":
-                        resource_dict["resource_pii"] += [pii]
+                        resource_pii["resource_pii"] += [pii]
         else:
-            resource_dict["pii_justification"] = st.radio(
+            resource_pii["pii_justification"] = st.radio(
                 label="What is the justification for this resource possibly not having personally identifiable or sensitive content?",
                 options=["general knowledge not written by or referring to private persons", "fictional text", "other"],
             )
-            if resource_dict["pii_justification"] == "other":
-                resource_dict["pii_justification"] = st.text_area(
+            if resource_pii["pii_justification"] == "other":
+                resource_pii["pii_justification_other"] = st.text_area(
                     label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
                     help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
+                    key="primary_justification_other"
                 )
+        resource_dict["resource_pii"] = resource_pii
                 
     form_col.markdown("### Primary source type")
     with form_col.expander("Source category"):
@@ -497,8 +499,20 @@ if resource_dict["type"] == "Primary source":
 
     with form_col.expander("Media amounts"):
         st.write(
-            "TODO: amount of data - list of number of items, what an item is, and expected number of words per item"
+            "Please estimate the amount of data in the dataset"
         )
+        media_amount = {}
+        media_amount["media_count"] = st.text_input(
+            label="Please estimate the number of instances in the dataset",
+        )
+        media_amount["media_instance"] = st.text_input(
+            label="Please describe what an instance consists of",
+            help="Instances may consist of sentences, posts, or larger units like paragraphs."
+        )
+        media_amount["media_instance_words"] = st.text_input(
+            label="Please estimate the number of words per instance",
+        )
+        resource_dict["media_amount"] = media_amount
 
 if resource_dict["type"] == "Processed dataset":
     form_col.markdown("### Processed dataset availability")
@@ -582,15 +596,15 @@ if resource_dict["type"] == "Processed dataset":
             st.write("TODO: what do we do for nonexistent or unclear licenses?")
 
     with form_col.expander("Personal Identifying Information"):
-        resource_dict["resource_pii"] = []
+        resource_pii = {}
         st.write("Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:")
-        resource_dict["has_pii"] = st.radio(
+        resource_pii["has_pii"] = st.radio(
             label="Does the language data in the resource contain personally identifiable or sensitive information?",
             help="See the guide for descriptions and examples. The default answer should be 'Yes'. Answers of 'No' and 'Unclear' require justifications.",
             options=["Yes", "No", "Unclear"],
         )
         st.markdown("---\n")
-        if resource_dict["has_pii"] == "Yes":
+        if resource_pii["has_pii"] == "Yes":
             st.markdown("If the resource does contain personally identifiable or sensitive information, please select what types:")
             buttons_pii = [False for _ in range(MAX_PII + 1)]
             buttons_pii[0] = True
@@ -603,17 +617,19 @@ if resource_dict["type"] == "Processed dataset":
                     )
                     buttons_pii[lni + 1] = st.checkbox(f"Add PII Type {lni+2}")
                     if pii != "":
-                        resource_dict["resource_pii"] += [pii]
+                        resource_pii["resource_pii"] += [pii]
         else:
-            resource_dict["pii_justification"] = st.radio(
+            resource_pii["pii_justification"] = st.radio(
                 label="What is the justification for this resource possibly not having personally identifiable or sensitive content?",
                 options=["general knowledge not written by or referring to private persons", "fictional text", "other"],
             )
-            if resource_dict["pii_justification"] == "other":
-                resource_dict["pii_justification"] = st.text_area(
+            if resource_pii["pii_justification"] == "other":
+                resource_pii["pii_justification_other"] = st.text_area(
                     label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
                     help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
+                    key="processed_justification_other"
                 )
+        resource_dict["resource_pii"] = resource_pii
 
     form_col.markdown("### Primary sources of processed dataset")
     with form_col.expander("List primary sources"):
@@ -647,7 +663,7 @@ if resource_dict["type"] == "Partner organization":
             label="If available, please enter an email address that can be used to ask them about using/obtaining their data:"
         )
         resource_dict["owner_contact_submitter"] = st.radio(
-            label="Would you be willing to reach out to the entity to ask them about using their data (with support from the BigScience data sourcing team)? If so, make sure to fill out your email information in the left sidebar.",
+            label="Would you be willing to reach out to the entity to ask them about using their data (with support from the BigScience data sourcing team)? If so, make sure to fill out your email information in the left sidebar.\n",
             options=["Yes", "No"],
             index=1,
         )
