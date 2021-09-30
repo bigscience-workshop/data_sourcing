@@ -160,7 +160,7 @@ with form_col.expander("General information"):
         help="This should be a human-readable name such as e.g. **Le Monde newspaper** (primary source), **EXAMS QA dataset** (processed dataset), or **Creative Commons** (partner organization)",
     )
     resource_dict["uid"] = st.text_input(
-        label=f"Provide a short `camel_case` unique identifier for the resource",
+        label=f"Provide a short `snake_case` unique identifier for the resource",
         help="For example `le_monde_primary`, `exams_dataset`, or `creative_commons_org`",
     )
     resource_dict["homepage"] = st.text_input(
