@@ -97,6 +97,39 @@ primary_taxonomy = {
     "other": [],
 }
 
+# from Data Tooling docs
+pii_categories = [
+    "names",
+    "addresses",
+    "dates (birth, death, etc.)",
+    "telephone numbers",
+    "vehicle identifiers and serial numbers",
+    "fax numbers",
+    "device identifiers and serial numbers",
+    "email addresses",
+    "URLs",
+    "social security numbers",
+    "IP addresses",
+    "medical record numbers",
+    "biometric identifiers (fingerprints, voice, etc.)",
+    "health plan beneficiary numbers",
+    "full-face photographs and comparable images",
+    "account numbers",
+    "uniquely identifying numbers",
+    "certificate/license numbers"
+]
+
+sensitive_categories = [
+    "racial or ethnic origin",
+    "political opinioins",
+    "religious or philosophical beliefs",
+    "trade-union membership",
+    "genetic data",
+    "health-related data",
+    "data concerning a person's sex life or sexual orientation"
+]
+MAX_PII = 25
+
 resource_dict = {
     "type": "",
     "name": "",
@@ -324,8 +357,40 @@ if resource_dict["type"] == "Primary source":
             st.write("TODO: what do we do for nonexistent or unclear licenses?")
 
     with form_col.expander("Personal Identifying Information"):
-        st.write("TODO: Risk of PII - category and justificaction (cat + string)")
-
+        #st.write("TODO: Risk of PII - category and justificaction (cat + string)")
+        resource_dict["resource_pii"] = []
+        st.write("Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:")
+        resource_dict["has_pii"] = st.radio(
+            label="Does the language data in the resource contain personally identifiable or sensitive information?",
+            help="See the guide for descriptions and examples. The default answer should be 'Yes'. Answers of 'No' and 'Unclear' require justifications.",
+            options=["Yes", "No", "Unclear"],
+        )
+        st.markdown("---\n")
+        if resource_dict["has_pii"] == "Yes":
+            st.markdown("If the resource does contain personally identifiable or sensitive information, please select what types:")
+            buttons_pii = [False for _ in range(MAX_PII + 1)]
+            buttons_pii[0] = True
+            for lni in range(MAX_PII):
+                if buttons_pii[lni]:
+                    pii = st.selectbox(
+                        label=f"What type(s) of PII does the resource contain? Type {lni+1}",
+                        options=[""] + pii_categories + sensitive_categories,
+                        help="E.g.: Does the resource contain names, birth dates, or personal life details?",
+                    )
+                    buttons_pii[lni + 1] = st.checkbox(f"Add PII Type {lni+2}")
+                    if pii != "":
+                        resource_dict["resource_pii"] += [pii]
+        else:
+            resource_dict["pii_justification"] = st.radio(
+                label="What is the justification for this resource possibly not having personally identifiable or sensitive content?",
+                options=["general knowledge not written by or referring to private persons", "fictional text", "other"],
+            )
+            if resource_dict["pii_justification"] == "other":
+                resource_dict["pii_justification"] = st.text_area(
+                    label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
+                    help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
+                )
+                
     form_col.markdown("### Primary source type")
     with form_col.expander("Source category"):
         primary_tax_top = st.radio(
