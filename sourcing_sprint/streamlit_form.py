@@ -8,6 +8,11 @@ import streamlit as st
 ### Countries and languages
 # from Wikipedia and https://unstats.un.org/unsd/methodology/m49/
 regions, countries, region_tree = json.load(open("unstats_regions_countries.json", encoding="utf-8"))
+
+bcp_47 = json.load(open("bcp47.json", encoding="utf-8"))
+bcp_47_langs = [x for x in bcp_47["subtags"] if x["type"] == "language"]
+
+
 languages = {
     "Arabic": "Arabic",
     "Basque": "Basque",
@@ -187,8 +192,10 @@ with form_col.expander("Languages"):
                 help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language",
             )
             if resource_lang_group == "Other":
-                resource_lang_group = st.text_input(
-                    label="Please enter the name of the language you are adding the resource for:"
+                resource_lang_group = st.selectbox(
+                    label=f"Language (group) {lni+1}",
+                    options= [', '.join(x['description']) for x in bcp_47_langs],
+                    help="This is a comprehensive list of Languages, please select one using the search function",
                 )
             if resource_lang_group == "Niger-Congo":
                 resource_lang_subgroup = st.selectbox(
