@@ -19,8 +19,9 @@ languages = {
     "Indonesian": "Indonesian",
     "Niger-Congo": "African languages of the Niger-Congo family, incl. Bantu languages",
     "Portuguese": "Portuguese",
-    "Spanish": "Castillan",
+    "Spanish": "Spanish",
     "Vietnamese": "Vietnamese",
+    "Other": "Other languages",
 }
 # https://meta.wikimedia.org/wiki/African_languages
 niger_congo_languages = [
@@ -181,11 +182,11 @@ with form_col.expander("Languages"):
         if buttons_lang[lni]:
             resource_lang_group = st.selectbox(
                 label=f"Language (group) {lni+1}",
-                options=[""] + list(languages.keys()) + ["other"],
+                options=[""] + list(languages.keys()),
                 format_func=lambda x: languages.get(x, ""),
                 help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language",
             )
-            if resource_lang_group == "other":
+            if resource_lang_group == "Other":
                 resource_lang_group = st.text_input(
                     label="Please enter the name of the language you are adding the resource for:"
                 )
