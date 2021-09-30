@@ -26,7 +26,7 @@ languages = {
     "Portuguese": "Portuguese",
     "Spanish": "Spanish",
     "Vietnamese": "Vietnamese",
-    "Other": "Other languages",
+    "Other": "Other",
 }
 # https://meta.wikimedia.org/wiki/African_languages
 niger_congo_languages = [
