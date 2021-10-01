@@ -96,6 +96,7 @@ primary_taxonomy = {
     ],
     "other": [],
 }
+MAX_SOURCES = 25
 
 # from Data Tooling docs
 pii_categories = [
@@ -633,7 +634,64 @@ if resource_dict["type"] == "Processed dataset":
 
     form_col.markdown("### Primary sources of processed dataset")
     with form_col.expander("List primary sources"):
-        form_col.write("TODO: list and either link OR fill out relevant information")
+        processed_sources = {}
+        st.write("Please provide as much information as you can find about the data's primary sources:")
+        processed_sources["has_docs"] = st.radio(
+            label="Does the processed dataset provide documentation of its primary sources?",
+            options=["Yes", "No"],
+        )
+        st.markdown("---\n")
+        if processed_sources["has_docs"] == "Yes":
+            processed_sources["docs_link"] = st.text_input(
+                label="Please enter a link to the documentation:"
+            )
+        else:
+            st.markdown("If the resource does not already have documentation for its sources, please list them here:")
+            processed_sources["processed_source_type"] = []
+            buttons_sources = [False for _ in range(MAX_SOURCES + 1)]
+            buttons_sources[0] = True
+            for lni in range(MAX_SOURCES):
+                if buttons_sources[lni]:
+                    processed_tax_top = st.radio(
+                        label="Is the source best described as a:",
+                        options=["collection", "website", "other"],
+                        key=f"processed_sources_top{lni}"
+                    )
+                    if processed_tax_top == "website":
+                        processed_tax_web = st.selectbox(
+                            label="What kind of website?",
+                            options=[""] + primary_taxonomy["website"],
+                            key=f"processed_sources_web{lni}"
+                        )
+                    else:
+                        processed_tax_web = ""
+                    if processed_tax_top == "collection" or "collection" in processed_tax_web:
+                        processed_tax_col = st.selectbox(
+                            label="What kind of collection?",
+                            options=[""] + primary_taxonomy["collection"],
+                            key=f"processed_sources_col{lni}"
+                        )
+                    else:
+                        processed_tax_col = ""
+                    if processed_tax_top == "other":
+                        processed_tax_top = st.text_input(
+                            label="You entered `other` for the source type, how would you categorize it?",
+                            key=f"processed_sources_other{lni}"
+                        )
+                    if processed_tax_web == "other":
+                        processed_tax_web = st.text_input(
+                            label="You entered `other` for the type of website, how would you categorize it?",
+                            key=f"processed_sources_other_web{lni}"
+                        )
+                    if processed_tax_col == "other":
+                        processed_tax_col = st.text_input(
+                            label="You entered `other` for the type of collection, how would you categorize it?",
+                            key=f"processed_sources_other_col{lni}"
+                        )
+                    buttons_sources[lni + 1] = st.checkbox(f"Add Source Type {lni+2}")
+                    if processed_tax_top != "":
+                        processed_sources["processed_source_type"] += [(processed_tax_top, processed_tax_web, processed_tax_col)]
+        resource_dict["processed_sources"] = processed_sources
        
 if resource_dict["type"] == "Partner organization":
     form_col.markdown("### Partner Information")
