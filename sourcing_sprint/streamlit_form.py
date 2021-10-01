@@ -556,33 +556,33 @@ if resource_dict["type"] == "Processed dataset":
             buttons_pii[0] = True
             for lni in range(MAX_PII):
                 if buttons_pii[lni]:
-                    pii =  "",
-                    pii_macro = st.selectbox(
+                    pii = list()
+                    pii_macro = st.multiselect(
                         label=f"What type(s) of PII does the resource contain? Type {lni+1}",
-                        options=["", "General", "Numbers", "Sensitive"],
+                        options=["General", "Numbers", "Sensitive"],
                         help="E.g.: Does the resource contain names, birth dates, or personal life details?",
                     )
-                    if pii_macro == "General":
-                        pii = st.selectbox(
+                    if "General" in pii_macro:
+                        pii.extend(st.multiselect(
                             label=f"What type of PII does the resource contain? Type {lni+1}",
                             options=pii_categories["general"],
                             help="E.g.: Does the resource contain names, birth dates, or personal life details?",
-                        )
-                    elif pii_macro == "Numbers":
-                        pii = st.selectbox(
+                        ))
+                    if "Numbers" in pii_macro:
+                        pii.extend(st.multiselect(
                             label=f"What type of PII does the resource contain? Type {lni+1}",
                             options=pii_categories["numbers"],
                             help="E.g.: Does the resource contain phone numbers, credit card numbers, or other numbers?",
-                        )
-                    elif pii_macro == "Sensitive":
-                        pii = st.selectbox(
+                        ))
+                    if "Sensitive" in pii_macro:
+                        pii.extend(st.multiselect(
                             label=f"What type of PII does the resource contain? Type {lni+1}",
                             options=pii_categories["sensitive"],
                             help="E.g.: Does the resource contain names, birth dates, or personal life details?",
-                        )
+                        ))
                     buttons_pii[lni + 1] = st.checkbox(f"Add PII Type {lni+2}")
                     if pii != "":
-                        resource_pii["resource_pii"] = [(pii_macro, pii)]
+                        resource_pii["resource_pii"] = pii
         else:
             resource_pii["pii_justification"] = st.radio(
                 label="What is the justification for this resource possibly not having personally identifiable or sensitive content?",
