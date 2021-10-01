@@ -77,7 +77,9 @@ its owners or producers, and the format of the language data.
 - *Processed dataset*: a processed NLP dataset containing language data that can be used for language modeling (most items should be at least a few sentences long).
 You will be asked to fill in information about the dataset object itself as well as the primary sources it was derived from
 (e.g. Wikipedia, or news sites for most summarization datasets).
-- *Partner organization*:
+- *Partner organization*: an organization holding a set of resources and datasets of various types, formats, languages and/or with various degrees of availability.
+You will be asked to fill in information about the partner organization itself as well as information on how to get in contact with them.
+(e.g. The Internet Archive, The British Library, l'institut national de l'audiovisuel, Wikimedia Foundation, or other libraries, archival institutions, cultural organizations).
 """
 resource_dict["type"] = st.sidebar.radio(
     label="What resource type are you submitting?",
