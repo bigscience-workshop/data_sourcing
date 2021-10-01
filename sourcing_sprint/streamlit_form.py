@@ -312,6 +312,7 @@ if resource_dict["type"] in ["Primary source", "Processed dataset"]:
                 "",
                 "A commercial entity",
                 "A library, museum, or archival institute",
+                "A university or research institution",
                 "A nonprofit/NGO (other)",
                 "A government organization",
                 "A private individual",
