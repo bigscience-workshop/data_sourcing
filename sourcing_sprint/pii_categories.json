@@ -1,0 +1,34 @@
+{
+  "general": [
+    "names",
+    "physical addresses",
+    "email addresses",
+    "website account name or handle",
+    "dates (birth, death, etc.)",
+    "full-face photographs and comparable images",
+    "URLs",
+    "biometric identifiers (fingerprints, voice, etc.)"
+  ],
+  "sensitive": [
+    "racial or ethnic origin",
+    "political opinions",
+    "religious or philosophical beliefs",
+    "trade-union membership",
+    "genetic data",
+    "health-related data",
+    "data concerning a person's sex life or sexual orientation"
+  ],
+  "numbers": [
+    "telephone numbers",
+    "fax numbers",
+    "vehicle identifiers and serial numbers",
+    "device identifiers and serial numbers",
+    "social security numbers",
+    "IP addresses",
+    "medical record numbers",
+    "health plan beneficiary numbers",
+    "account numbers",
+    "uniquely identifying numbers",
+    "certificate/license numbers"
+  ]
+}

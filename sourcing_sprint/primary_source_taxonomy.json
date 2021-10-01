@@ -1,0 +1,23 @@
+{
+  "website": [
+    "social media",
+    "forum",
+    "news or magazine website",
+    "wiki",
+    "blog",
+    "official website",
+    "content repository, archive, or collection",
+    "other"
+  ],
+  "collection": [
+    "books/book publisher",
+    "scientific articles/journal",
+    "newspaper",
+    "radio",
+    "clips",
+    "movies and documentaries",
+    "podcasts",
+    "other"
+  ],
+  "other": []
+}

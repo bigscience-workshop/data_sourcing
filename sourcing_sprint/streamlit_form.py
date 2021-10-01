@@ -12,123 +12,16 @@ regions, countries, region_tree = json.load(open("unstats_regions_countries.json
 bcp_47 = json.load(open("bcp47.json", encoding="utf-8"))
 bcp_47_langs = [x for x in bcp_47["subtags"] if x["type"] == "language"]
 
-
-languages = {
-    "Arabic": "Arabic",
-    "Basque": "Basque",
-    "Catalan": "Catalan",
-    "Chinese": "Chinese",
-    "English": "English",
-    "French": "French",
-    "Indic": "Indic languages, incl. Bengali, Hindi, Urdu...",
-    "Indonesian": "Indonesian",
-    "Niger-Congo": "African languages of the Niger-Congo family, incl. Bantu languages",
-    "Portuguese": "Portuguese",
-    "Spanish": "Spanish",
-    "Vietnamese": "Vietnamese",
-    "other": "Other",
-}
-# https://meta.wikimedia.org/wiki/African_languages
-niger_congo_languages = [
-    "Akan",
-    "Bambara",
-    "Chi Chewa",
-    "ChiShona",
-    "ChiTumbuka",
-    "Fon",
-    "Igbo",
-    "isiZulu",
-    "Kinyarwanda",
-    "Kikongo",
-    "Kikuyu",
-    "Kirundi",
-    "Lingala",
-    "Luganda",
-    "Northern Sotho",
-    "Sesotho",
-    "Setswana",
-    "Swahili",
-    "Twi",
-    "Wolof",
-    "Xhosa",
-    "Xitsonga",
-    "Yoruba",
-]
-# TODO: add more
-indic_languages = [
-    "Assamese",
-    "Bengali",
-    "Gujarati",
-    "Hindi",
-    "Kannada",
-    "Malayalam",
-    "Marathi",
-    "Odia",
-    "Punjabi",
-    "Telugu",
-    "Tamil",
-    "Urdu",
-]
+language_lists = json.load(open("language_lists.json", encoding="utf-8"))
 MAX_LANGS = 25
 MAX_COUNTRIES = 25
 
 ### Primary source categories
-primary_taxonomy = {
-    "website": [
-        "social media",
-        "forum",
-        "news or magazine website",
-        "wiki",
-        "blog",
-        "official website",
-        "content repository, archive, or collection",
-        "other",
-    ],
-    "collection": [
-        "books/book publisher",
-        "scientific articles/journal",
-        "newspaper",
-        "radio",
-        "clips",
-        "movies and documentaries",
-        "podcasts",
-        "other",
-    ],
-    "other": [],
-}
+primary_taxonomy = json.load(open("primary_source_taxonomy.json", encoding="utf-8"))
 MAX_SOURCES = 25
 
 # from Data Tooling docs
-pii_categories = [
-    "names",
-    "addresses",
-    "dates (birth, death, etc.)",
-    "telephone numbers",
-    "vehicle identifiers and serial numbers",
-    "fax numbers",
-    "device identifiers and serial numbers",
-    "email addresses",
-    "URLs",
-    "social security numbers",
-    "IP addresses",
-    "medical record numbers",
-    "biometric identifiers (fingerprints, voice, etc.)",
-    "health plan beneficiary numbers",
-    "full-face photographs and comparable images",
-    "account numbers",
-    "uniquely identifying numbers",
-    "certificate/license numbers"
-]
-
-sensitive_categories = [
-    "racial or ethnic origin",
-    "political opinioins",
-    "religious or philosophical beliefs",
-    "trade-union membership",
-    "genetic data",
-    "health-related data",
-    "data concerning a person's sex life or sexual orientation"
-]
+pii_categories = json.load(open("pii_categories.json", encoding="utf-8"))
 MAX_PII = 25
 
 resource_dict = {
@@ -226,8 +119,8 @@ with form_col.expander("Languages"):
         if buttons_lang[lni]:
             resource_lang_group = st.selectbox(
                 label=f"Language (group) {lni+1}",
-                options=[""] + list(languages.keys()),
-                format_func=lambda x: languages.get(x, ""),
+                options=[""] + list(language_lists["language_groups"].keys()),
+                format_func=lambda x: language_lists["language_groups"].get(x, ""),
                 help="This is the higher-level classification, Indic and Niger-Congo languages open a new selection box for the specific language. If you cannot find the language in either the top-level or lower-level menus, select `Other` to search in a more extensive list.",
             )
             if resource_lang_group == "other":
@@ -239,12 +132,12 @@ with form_col.expander("Languages"):
             if resource_lang_group == "Niger-Congo":
                 resource_lang_subgroup = st.selectbox(
                     label=f"Niger-Congo language {lni+1}",
-                    options=[""] + niger_congo_languages,
+                    options=[""] + language_lists["niger_congo_languages"],
                 )
             elif resource_lang_group == "Indic":
                 resource_lang_subgroup = st.selectbox(
                     label=f"Indic language {lni+1}",
-                    options=[""] + indic_languages,
+                    options=[""] + language_lists["indic_languages"],
                 )
             else:
                 resource_lang_subgroup = ""
@@ -375,7 +268,7 @@ if resource_dict["type"] == "Primary source":
                 if buttons_pii[lni]:
                     pii = st.selectbox(
                         label=f"What type(s) of PII does the resource contain? Type {lni+1}",
-                        options=[""] + pii_categories + sensitive_categories,
+                        options=[""] + pii_categories["general"] + pii_categories["sensitive"] + pii_categories["numbers"],
                         help="E.g.: Does the resource contain names, birth dates, or personal life details?",
                     )
                     buttons_pii[lni + 1] = st.checkbox(f"Add PII Type {lni+2}")
@@ -393,7 +286,7 @@ if resource_dict["type"] == "Primary source":
                     key="primary_justification_other"
                 )
         resource_dict["resource_pii"] = resource_pii
-                
+
     form_col.markdown("### Primary source type")
     with form_col.expander("Source category"):
         primary_tax_top = st.radio(
@@ -692,7 +585,7 @@ if resource_dict["type"] == "Processed dataset":
                     if processed_tax_top != "":
                         processed_sources["processed_source_type"] += [(processed_tax_top, processed_tax_web, processed_tax_col)]
         resource_dict["processed_sources"] = processed_sources
-       
+
 if resource_dict["type"] == "Partner organization":
     form_col.markdown("### Partner Information")
     with form_col.expander("Data owner/custodian"):
