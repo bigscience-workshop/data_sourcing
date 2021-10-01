@@ -3,7 +3,7 @@
 ## Table of Contents
 * [Getting Started](#getting-started)
 * [Loading the Form](#loading-the-form)
-* [Filling Out the Form](#filling-out-the-form)
+* [Adding a New Entry](#adding-a-new-entry)
   * [Adding a Primary Source](#adding-a-primary-source)
     * [Name, ID, Homepage, Description](#name-id-homepage-description)
     * [Languages and Locations](#languages-and-locations)
@@ -19,7 +19,9 @@
     * [Name, ID, Homepage, Description](#name-id-homepage-description-2)
     * [Languages and Locations](#languages-and-locations-2)
     * [Partner Information](#partner-information)
-* [Submitting the Form](#submitting-the-form)
+  * [Submitting the Form](#submitting-the-form)
+* [Explore the Current Catalogue](#explore-the-current-catalogue)
+* [Validate an Existing Entry](#validate-an-existing-entry)
 * [Contact Information](#contact-information)
 
 ## Getting Started
@@ -30,11 +32,11 @@ Thank you for participating in the BigScience Data Sourcing hackathon! Please us
 
 To load the form **###TODO###**
 
-## Filling Out the Form
+## Adding a New Entry
 
 To get started, please add your name, add your email (optional), and select the type of resource you would like to add in the left-hand column. Then proceed to filling out the form. 
 
-For the purposes of this work, we're organizing data sources into three categories: primary source, processed dataset, and partner organization.
+For the purposes of this work, we're organizing resources into three categories: primary source, processed dataset, and partner organization. Select the type of resource you are providing information for in the **General Information** subsection of the **Name, ID, Homepage, Description** section of the form.
 
 ### Adding a Primary Source
 
@@ -44,7 +46,7 @@ You will be asked to fill in information about the availability of the source, i
 
 #### Name, ID, Homepage, Description
 
-First, provide a descriptive name for the resource. This should be a human-readable name such as e.g. **Le Monde newspaper**. 
+First, provide a descriptive name for the resource. This should be a human-readable name such as *Le Monde newspaper*. 
 
 In the next box provide a short `snake_case` unique identifier for the resource, for example `le_monde_primary`.
 
@@ -60,9 +62,9 @@ Please add all of the languages that are covered by the resource. For each addit
 
 **Locations**
 
-For the location of the resource, select the country where the resource or organization itself located or hosted. E.g.: where is the **website hosted**, what is the physical **location of the library**, etc.?
+For the location of the resource, select the country where the resource or organization itself located or hosted. For example, where is the *website hosted*, what is the physical *location of the library*, etc.?
 
-Additionally, please select all of the countries where the data creators represented in the source are from. E.g.: where are the **people who write on the website** hosted, where are the **media managed by the library** from?
+Additionally, please select all of the countries where the data creators represented in the source are from. For example, where are the *people who write on the website* hosted, where are the *media managed by the library* from?
 
 #### Primary Source Availability
 
@@ -111,7 +113,6 @@ If yes, please select what kinds from the dropdown boxes. The default answer sho
 
 If no or unclear, please select your reason for why there may not be personally indetifiable information in the data. Reasons may include that the data only contains general knowledge not written by or referring to private persons, or that the data consists of fictional text. If there is some other reason, please provide justification in the text box.
 
-
 #### Primary Source Type
 
 Please provide a description for the type of resource. We provide two possible types:
@@ -128,21 +129,31 @@ If neither of these options appropriately describes the resource, please select 
 
 **Media Type**
 
+Please provide information about the format of the language data. Select whether the language data in the resource is primarily text, audiovisual (from either video or audio recordings), or image data. Media data provided with transcription should select text, then select the transcribed option. PDFs that have pre-extracted text information should select text, while PDFs that need OCR should go into images. Select the latter if you're unsure.
+
+If the data is primarily text, please select what format the text is in from the dropdown menu: plain text, HTML, PDF, XML, mediawiki, or other. If other, please enter a text description of the format. Select whether the text was transcribed from another media format and, if so, whether that media format was audiovisual or images.
+
+If the data is primarily audiovisual, please select what format the text is in from the dropdown menu: mp4, wav, video, or other. If other, please enter a text description of the format.
+
+If the data is primarily images, please select what format the text is in from the dropdown menu: JPEG, PNG, PDF, TIFF, or other. If other, please enter a text description of the format.
+
 **Media Amounts**
+
+Please estimate the amount of data in the dataset. Include an estimate of the number of instances in the resource as well as a description of what an instance consists of. This may include sentences, posts, or larger units such as paragraphs. Finally, include an estimate of the number of words per instance.
 
 ### Adding a Processed Dataset
 
-A processed NLP dataset contains language data that can be used for language modeling. These resources are dericed from one or several other primary sources. For example, the CNN/Dailymail summarization dataset is derived from the CNN and Dailymail websites. 
+A processed NLP dataset contains language data that can be used for language modeling. These resources are derived from one or several other primary sources. For example, the CNN/Dailymail summarization dataset is derived from the CNN and Dailymail websites. 
 
 You will be asked to fill in information about the dataset object itself as well as the primary sources it was derived from.
 
 #### Name, ID, Homepage, Description
 
-First, provide a descriptive name for the resource. This should be a human-readable name such as e.g. **EXAMS QA dataset**. 
+First, provide a descriptive name for the resource. This should be a human-readable name such as *EXAMS QA dataset*. 
 
 In the next box provide a short `snake_case` unique identifier for the resource, for example `exams_dataset`.
 
-If available, provide a link to the home page for the resource e.g. https://github.com/mhardalov/exams-qa.
+If available, provide a link to the home page for the resource, e.g. https://github.com/mhardalov/exams-qa.
 
 Provide a short description of the resource, in a few words to a few sentences. The description will be used to index and navigate the catalogue. 
 
@@ -154,9 +165,9 @@ Please add all of the languages that are covered by the resource. For each addit
 
 **Locations**
 
-For the location of the resource, select the country where the resource or organization itself located or hosted. E.g.: where is the **website hosted**, what is the physical **location of the library**, etc.?
+For the location of the resource, select the country where the resource or organization itself located or hosted. For example, where is the *website hosted*, what is the physical *location of the library*, etc.?
 
-Additionally, please select all of the countries where the data creators represented in the source are from. E.g.: where are the **people who write on the website** hosted, where are the **media managed by the library** from?
+Additionally, please select all of the countries where the data creators represented in the source are from. For example, where are the *people who write on the website* hosted, where are the *media managed by the library* from?
 
 #### Processed Dataset Availability
 
@@ -227,11 +238,11 @@ You will be asked to fill in information about the partner organization itself a
 
 #### Name, ID, Homepage, Description
 
-First, provide a descriptive name for the resource. This should be a human-readable name such as e.g. **Creative Commons**. 
+First, provide a descriptive name for the resource. This should be a human-readable name such as *Creative Commons*. 
 
 In the next box provide a short `snake_case` unique identifier for the resource, for example `creative_commons_org`.
 
-If available, provide a link to the home page for the resource e.g. https://creativecommons.org/.
+If available, provide a link to the home page for the resource, e.g. https://creativecommons.org/.
 
 Provide a short description of the resource, in a few words to a few sentences. The description will be used to index and navigate the catalogue. 
 
@@ -243,9 +254,9 @@ Please add all of the languages that are covered by the resource. For each addit
 
 **Locations** 
 
-For the location of the resource, select the country where the resource or organization itself located or hosted. E.g.: where is the **website hosted**, what is the physical **location of the library**, etc.?
+For the location of the resource, select the country where the resource or organization itself located or hosted. For example, where is the *website hosted*, what is the physical *location of the library*, etc.?
 
-Additionally, please select all of the countries where the data creators represented in the source are from. E.g.: where are the **people who write on the website** hosted, where are the **media managed by the library** from?
+Additionally, please select all of the countries where the data creators represented in the source are from. For example, where are the *people who write on the website* hosted, where are the *media managed by the library* from?
 
 #### Partner Information
 
@@ -255,13 +266,20 @@ Please select whether you would be willing to contact the entity to ask them abo
 
 If there is a URL where we can find out more information about the data owner/custodian, please add it to the final textbox. For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists.
 
-## Submitting the Form
+### Submitting the Form
 
 Thank you for filling out the submission form! Please review your answers, which are visible in the right sidebar in json format, prior to submitting.
 
 To submit the form, please **###TODO###**
 
+## Explore the Current Catalogue
+
+**###TODO###**
+
+## Validate an Existing Entry
+
+**###TODO###**
+
 ## Contact Information
 
 If you have any questions or issues with the form, please contact **###TODO###**
-
