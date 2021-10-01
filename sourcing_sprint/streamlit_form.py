@@ -508,7 +508,7 @@ if resource_dict["type"] == "Processed dataset":
                 if buttons_pii[lni]:
                     pii = st.selectbox(
                         label=f"What type(s) of PII does the resource contain? Type {lni+1}",
-                        options=[""] + pii_categories["general"] + pii_categories["sensitive"],
+                        options=[""] + pii_categories["general"] + pii_categories["sensitive"] + pii_categories["numbers"],
                         help="E.g.: Does the resource contain names, birth dates, or personal life details?",
                     )
                     buttons_pii[lni + 1] = st.checkbox(f"Add PII Type {lni+2}")
