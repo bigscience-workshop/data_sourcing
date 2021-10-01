@@ -81,7 +81,9 @@ its owners or producers, and the format of the language data.
 - *Processed dataset*: a processed NLP dataset containing language data that can be used for language modeling (most items should be at least a few sentences long).
 You will be asked to fill in information about the dataset object itself as well as the primary sources it was derived from
 (e.g. Wikipedia, or news sites for most summarization datasets).
-- *Partner organization*:
+- *Partner organization*: an organization holding a set of resources and datasets of various types, formats, languages and/or with various degrees of availability.
+You will be asked to fill in information about the partner organization itself as well as information on how to get in contact with them.
+(e.g. The Internet Archive, The British Library, l'institut national de l'audiovisuel, Wikimedia Foundation, or other libraries, archival institutions, cultural organizations).
 """
 
 st.markdown("---\n##### What would you like to use this app for?")
@@ -555,14 +557,33 @@ if resource_dict["type"] == "Processed dataset":
             buttons_pii[0] = True
             for lni in range(MAX_PII):
                 if buttons_pii[lni]:
-                    pii = st.selectbox(
+                    pii =  "",
+                    pii_macro = st.selectbox(
                         label=f"What type(s) of PII does the resource contain? Type {lni+1}",
-                        options=[""] + pii_categories + sensitive_categories,
+                        options=["", "General", "Numbers", "Sensitive"],
                         help="E.g.: Does the resource contain names, birth dates, or personal life details?",
                     )
+                    if pii_macro == "General":
+                        pii = st.selectbox(
+                            label=f"What type of PII does the resource contain? Type {lni+1}",
+                            options=pii_categories["general"],
+                            help="E.g.: Does the resource contain names, birth dates, or personal life details?",
+                        )
+                    elif pii_macro == "Numbers":
+                        pii = st.selectbox(
+                            label=f"What type of PII does the resource contain? Type {lni+1}",
+                            options=pii_categories["numbers"],
+                            help="E.g.: Does the resource contain phone numbers, credit card numbers, or other numbers?",
+                        )
+                    elif pii_macro == "Sensitive":
+                        pii = st.selectbox(
+                            label=f"What type of PII does the resource contain? Type {lni+1}",
+                            options=pii_categories["sensitive"],
+                            help="E.g.: Does the resource contain names, birth dates, or personal life details?",
+                        )
                     buttons_pii[lni + 1] = st.checkbox(f"Add PII Type {lni+2}")
                     if pii != "":
-                        resource_pii["resource_pii"] += [pii]
+                        resource_pii["resource_pii"] = [(pii_macro, pii)]
         else:
             resource_pii["pii_justification"] = st.radio(
                 label="What is the justification for this resource possibly not having personally identifiable or sensitive content?",
