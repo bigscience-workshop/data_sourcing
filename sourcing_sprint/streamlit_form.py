@@ -72,7 +72,26 @@ with st.sidebar.form("submitter_information"):
     )
     submitted_info = st.form_submit_button("Submit self information")
 
-st.sidebar.markdown("### Resource type")
+st.markdown("#### What would you like to use this app for?")
+add_col, viz_col, val_col = st.columns([1, 1, 1])
+add_mode_button = add_col.button("Add a new entry")
+viz_mode = viz_col.button("Explore the current catalogue")
+val_mode = val_col.button("Validate an existing entry")
+add_mode = add_mode_button or not (val_mode or viz_mode)
+if add_mode:
+    col_sizes = [70, 30, 5, 1, 5, 1]
+if viz_mode:
+    col_sizes = [5, 1, 100, 1, 5, 1]
+if val_mode:
+    col_sizes = [5, 1, 5, 1, 100, 1]
+
+st.markdown("---\n")
+
+form_col, display_col, viz_col, _, val_col, _ = st.columns(col_sizes)
+
+if add_mode:
+    form_col.markdown("### Entry Category, Name, ID, Homepage, Description")
+
 resource_type_help = """
 You may choose one of the following three resource types:
 - *Primary source*: a single source of language data (text or speech), such as a newspaper, radio, website, book collection, etc.
@@ -85,26 +104,6 @@ You will be asked to fill in information about the dataset object itself as well
 You will be asked to fill in information about the partner organization itself as well as information on how to get in contact with them.
 (e.g. The Internet Archive, The British Library, l'institut national de l'audiovisuel, Wikimedia Foundation, or other libraries, archival institutions, cultural organizations).
 """
-
-st.markdown("---\n##### What would you like to use this app for?")
-add_col, viz_col, val_col = st.columns([1, 1, 1])
-add_mode_button = add_col.button("Add a new entry")
-viz_mode = viz_col.button("Explore the current catalogue")
-val_mode = val_col.button("Validate an existing entry")
-add_mode = add_mode_button or not (val_mode or viz_mode)
-if add_mode:
-    col_sizes = [100, 70, 1, 1, 1]
-if viz_mode:
-    col_sizes = [5, 3, 100, 1, 1]
-if val_mode:
-    col_sizes = [5, 1, 1, 100, 1]
-
-st.markdown("---\n")
-
-form_col, display_col, viz_col, val_col, _ = st.columns(col_sizes)
-
-if add_mode:
-    form_col.markdown("### Name, ID, Homepage, Description")
 
 with form_col.expander(
     "General information" if add_mode else "",
@@ -713,8 +712,48 @@ if add_mode:
         st.markdown(f"You are entering a new resource of type: *{resource_dict['type']}*")
         st.write(resource_dict)
 
+with viz_col.expander(
+    "Select resources to visualize" if viz_mode else "",
+    expanded=viz_mode
+):
+    st.write("TODO: add selection widgets")
+
 if viz_mode:
-    viz_col.write("TODO: add visualization of catalogue")
+    viz_col.write("TODO: add interactive map here")
+
+with viz_col.expander(
+    "ElasticSearch of resource names and descriptions" if viz_mode else "",
+    expanded=viz_mode
+):
+    st.write("TODO: implement ElasticSearch index and enable search here")
+
+
+with val_col.expander(
+    "Select catalogue entry to validate" if val_mode else "",
+    expanded=val_mode,
+):
+    st.write("TODO: either propose an entry that still needs to be validate, or let the user navigate and find one themselves")
 
 if val_mode:
-    val_col.write("TODO: add form to select and validate existing entry")
+    val_col.markdown("### Entry Category, Name, ID, Homepage, Description")
+
+with val_col.expander(
+    "Validate general information for the entry" if val_mode else "",
+    expanded=val_mode,
+):
+    st.write("TODO: load general information for selected entry and let user modify/save/validate")
+
+if val_mode:
+    val_col.markdown("### Languages and locations")
+
+with val_col.expander(
+    "Validate language information for the entry" if val_mode else "",
+    expanded=val_mode,
+):
+    st.write("TODO: load language information for selected entry and let user modify/save/validate")
+
+with val_col.expander(
+    "Validate location information for the entry" if val_mode else "",
+    expanded=val_mode,
+):
+    st.write("TODO: load location information for selected entry and let user modify/save/validate")
