@@ -260,7 +260,11 @@
     "Zambia",
     "Zimbabwe",
     "\u00c5land Islands",
-    "China"
+    "China",
+    "Italy",
+    "Northern Cyprus",
+    "Portugal",
+    "Serbia"
   ],
   {
     "Africa": [
@@ -501,7 +505,8 @@
       "Ukraine",
       "Czech Republic",
       "Russia",
-      "Moldova"
+      "Moldova",
+      "Serbia"
     ],
     "Northern Europe": [
       "\u00c5land Islands",
@@ -546,7 +551,10 @@
       "Azores",
       "Vatican City",
       "Madeira",
-      "Kosovo"
+      "Kosovo",
+      "Italy",
+      "Northern Cyprus",
+      "Portugal"
     ],
     "Western Europe": [
       "Austria",
