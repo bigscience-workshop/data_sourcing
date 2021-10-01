@@ -455,7 +455,10 @@ if resource_dict["type"] == "Primary source":
 if resource_dict["type"] == "Processed dataset":
     if add_mode:
         form_col.markdown("### Primary sources of processed dataset")
-    with form_col.expander("List primary sources" if add_mode else ""):
+    with form_col.expander(
+        "List primary sources" if add_mode else "",
+        expanded = add_mode,
+    ):
         processed_sources = {}
         st.write("Please provide as much information as you can find about the data's primary sources:")
         processed_sources["has_docs"] = st.radio(
