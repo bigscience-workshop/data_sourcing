@@ -32,9 +32,11 @@ Thank you for participating in the BigScience Data Sourcing hackathon! Please us
 
 To load the form **###TODO###**
 
+There are three tabs to select from at the top of the form: `Add a new entry`, `Explore the current catalogue`, and `Validate an existing entry`. Select the appropriate tab to either complete the form for a new data source submission, look at what sources have been submitted to the hackathon so far, or verify the information for those submitted sources.
+
 ## Adding a New Entry
 
-To get started, please add your name, add your email (optional), and select the type of resource you would like to add in the left-hand column. Then proceed to filling out the form. 
+To get started, please select the `Add a new entry` tab at the top of the form and add your name and your email (optional) in the left sidebar. Then proceed to filling out the form. 
 
 For the purposes of this work, we're organizing resources into three categories: primary source, processed dataset, and partner organization. Select the type of resource you are providing information for in the **General Information** subsection of the **Name, ID, Homepage, Description** section of the form.
 
@@ -277,6 +279,10 @@ To submit the form, please **###TODO###**
 **###TODO###**
 
 ## Validate an Existing Entry
+
+To get started, please select the `Validate an existing entry` tab at the top of the form and add your name and your email (optional) in the left sidebar. Then proceed to filling out the form. 
+
+You may select an entry to validate, or validate the entry proposed by the form.
 
 **###TODO###**
 
