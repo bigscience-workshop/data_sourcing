@@ -95,7 +95,7 @@ add_mode = add_mode_button or not (val_mode or viz_mode)
 if add_mode:
     col_sizes = [100, 70, 1, 1, 1]
 if viz_mode:
-    col_sizes = [5, 1, 100, 1, 1]
+    col_sizes = [5, 3, 100, 1, 1]
 if val_mode:
     col_sizes = [5, 1, 1, 100, 1]
 
