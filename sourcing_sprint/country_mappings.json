@@ -1,332 +1,116 @@
 {
   "to_outline": {
-    "Democratic Republic of the Congo": [
-      "Democratic Republic of the Congo"
-    ],
-    "Congo [DRC]": [
-      "Democratic Republic of the Congo"
-    ],
-    "Congo": [
-      "Democratic Republic of the Congo"
-    ],
-    "Republic of the Congo": [
-      "Republic of the Congo"
-    ],
-    "Congo [Republic]": [
-      "Republic of the Congo"
-    ],
-    "East Timor": [
-      "East Timor"
-    ],
-    "Timor-Leste": [
-      "East Timor"
-    ],
-    "Falkland Islands": [
-      "Falkland Islands"
-    ],
-    "Falkland Islands [Islas Malvinas]": [
-      "Falkland Islands"
-    ],
-    "Gambia": [
-      "Gambia"
-    ],
-    "The Gambia": [
-      "Gambia"
-    ],
-    "Guinea Bissau": [
-      "Guinea Bissau"
-    ],
-    "Guinea-Bissau": [
-      "Guinea Bissau"
-    ],
-    "Ivory Coast": [
-      "Ivory Coast"
-    ],
-    "C\u00f4te d'Ivoire": [
-      "Ivory Coast"
-    ],
-    "Cote d'Ivoire": [
-      "Ivory Coast"
-    ],
-    "Macedonia": [
-      "Macedonia"
-    ],
-    "Macedonia [FYROM]": [
-      "Macedonia"
-    ],
-    "North Macedonia": [
-      "Macedonia"
-    ],
-    "Myanmar": [
-      "Myanmar"
-    ],
-    "Myanmar [Burma]": [
-      "Myanmar"
-    ],
-    "Republic of Serbia": [
-      "Republic of Serbia"
-    ],
-    "Serbia": [
-      "Republic of Serbia"
-    ],
-    "Somaliland": [
-      "Somaliland"
-    ],
-    "Somalia": [
-      "Somaliland"
-    ],
-    "Swaziland": [
-      "Swaziland"
-    ],
-    "Eswatini": [
-      "Swaziland"
-    ],
-    "The Bahamas": [
-      "The Bahamas"
-    ],
-    "Bahamas": [
-      "The Bahamas"
-    ],
-    "United Republic of Tanzania": [
-      "United Republic of Tanzania"
-    ],
-    "Tanzania": [
-      "United Republic of Tanzania"
-    ],
-    "United States of America": [
-      "United States of America"
-    ],
-    "United States": [
-      "United States of America"
-    ],
-    "West Bank": [
-      "West Bank"
-    ],
-    "Palestinian Territories": [
-      "West Bank"
-    ],
-    "Palestine": [
-      "West Bank"
-    ]
+    "Democratic Republic of the Congo": "Democratic Republic of the Congo",
+    "Congo [DRC]": "Democratic Republic of the Congo",
+    "Congo": "Democratic Republic of the Congo",
+    "Republic of the Congo": "Republic of the Congo",
+    "Congo [Republic]": "Republic of the Congo",
+    "East Timor": "East Timor",
+    "Timor-Leste": "East Timor",
+    "Falkland Islands": "Falkland Islands",
+    "Falkland Islands [Islas Malvinas]": "Falkland Islands",
+    "Gambia": "Gambia",
+    "The Gambia": "Gambia",
+    "Guinea Bissau": "Guinea Bissau",
+    "Guinea-Bissau": "Guinea Bissau",
+    "Ivory Coast": "Ivory Coast",
+    "C\u00f4te d'Ivoire": "Ivory Coast",
+    "Cote d'Ivoire": "Ivory Coast",
+    "Macedonia": "Macedonia",
+    "Macedonia [FYROM]": "Macedonia",
+    "North Macedonia": "Macedonia",
+    "Myanmar": "Myanmar",
+    "Myanmar [Burma]": "Myanmar",
+    "Republic of Serbia": "Republic of Serbia",
+    "Serbia": "Republic of Serbia",
+    "Somaliland": "Somaliland",
+    "Somalia": "Somaliland",
+    "Swaziland": "Swaziland",
+    "Eswatini": "Swaziland",
+    "The Bahamas": "The Bahamas",
+    "Bahamas": "The Bahamas",
+    "United Republic of Tanzania": "United Republic of Tanzania",
+    "Tanzania": "United Republic of Tanzania",
+    "United States of America": "United States of America",
+    "United States": "United States of America",
+    "West Bank": "West Bank",
+    "Palestinian Territories": "West Bank",
+    "Palestine": "West Bank"
   },
   "to_center": {
-    "Democratic Republic of the Congo": [
-      "Congo [DRC]"
-    ],
-    "Congo [DRC]": [
-      "Congo [DRC]"
-    ],
-    "Congo": [
-      "Congo [DRC]"
-    ],
-    "Republic of the Congo": [
-      "Congo [Republic]"
-    ],
-    "Congo [Republic]": [
-      "Congo [Republic]"
-    ],
-    "East Timor": [
-      "Timor-Leste"
-    ],
-    "Timor-Leste": [
-      "Timor-Leste"
-    ],
-    "Falkland Islands": [
-      "Falkland Islands [Islas Malvinas]"
-    ],
-    "Falkland Islands [Islas Malvinas]": [
-      "Falkland Islands [Islas Malvinas]"
-    ],
-    "Gambia": [
-      "Gambia"
-    ],
-    "The Gambia": [
-      "Gambia"
-    ],
-    "Guinea Bissau": [
-      "Guinea-Bissau"
-    ],
-    "Guinea-Bissau": [
-      "Guinea-Bissau"
-    ],
-    "Ivory Coast": [
-      "C\u00f4te d'Ivoire"
-    ],
-    "C\u00f4te d'Ivoire": [
-      "C\u00f4te d'Ivoire"
-    ],
-    "Cote d'Ivoire": [
-      "C\u00f4te d'Ivoire"
-    ],
-    "Macedonia": [
-      "Macedonia [FYROM]"
-    ],
-    "Macedonia [FYROM]": [
-      "Macedonia [FYROM]"
-    ],
-    "North Macedonia": [
-      "Macedonia [FYROM]"
-    ],
-    "Myanmar": [
-      "Myanmar [Burma]"
-    ],
-    "Myanmar [Burma]": [
-      "Myanmar [Burma]"
-    ],
-    "Republic of Serbia": [
-      "Serbia"
-    ],
-    "Serbia": [
-      "Serbia"
-    ],
-    "Somaliland": [
-      "Somalia"
-    ],
-    "Somalia": [
-      "Somalia"
-    ],
-    "Swaziland": [
-      "Swaziland"
-    ],
-    "Eswatini": [
-      "Swaziland"
-    ],
-    "The Bahamas": [
-      "Bahamas"
-    ],
-    "Bahamas": [
-      "Bahamas"
-    ],
-    "United Republic of Tanzania": [
-      "Tanzania"
-    ],
-    "Tanzania": [
-      "Tanzania"
-    ],
-    "United States of America": [
-      "United States"
-    ],
-    "United States": [
-      "United States"
-    ],
-    "West Bank": [
-      "Palestinian Territories"
-    ],
-    "Palestinian Territories": [
-      "Palestinian Territories"
-    ],
-    "Palestine": [
-      "Palestinian Territories"
-    ]
+    "Democratic Republic of the Congo": "Congo [DRC]",
+    "Congo [DRC]": "Congo [DRC]",
+    "Congo": "Congo [DRC]",
+    "Republic of the Congo": "Congo [Republic]",
+    "Congo [Republic]": "Congo [Republic]",
+    "East Timor": "Timor-Leste",
+    "Timor-Leste": "Timor-Leste",
+    "Falkland Islands": "Falkland Islands [Islas Malvinas]",
+    "Falkland Islands [Islas Malvinas]": "Falkland Islands [Islas Malvinas]",
+    "Gambia": "Gambia",
+    "The Gambia": "Gambia",
+    "Guinea Bissau": "Guinea-Bissau",
+    "Guinea-Bissau": "Guinea-Bissau",
+    "Ivory Coast": "C\u00f4te d'Ivoire",
+    "C\u00f4te d'Ivoire": "C\u00f4te d'Ivoire",
+    "Cote d'Ivoire": "C\u00f4te d'Ivoire",
+    "Macedonia": "Macedonia [FYROM]",
+    "Macedonia [FYROM]": "Macedonia [FYROM]",
+    "North Macedonia": "Macedonia [FYROM]",
+    "Myanmar": "Myanmar [Burma]",
+    "Myanmar [Burma]": "Myanmar [Burma]",
+    "Republic of Serbia": "Serbia",
+    "Serbia": "Serbia",
+    "Somaliland": "Somalia",
+    "Somalia": "Somalia",
+    "Swaziland": "Swaziland",
+    "Eswatini": "Swaziland",
+    "The Bahamas": "Bahamas",
+    "Bahamas": "Bahamas",
+    "United Republic of Tanzania": "Tanzania",
+    "Tanzania": "Tanzania",
+    "United States of America": "United States",
+    "United States": "United States",
+    "West Bank": "Palestinian Territories",
+    "Palestinian Territories": "Palestinian Territories",
+    "Palestine": "Palestinian Territories"
   },
   "to_region": {
-    "Democratic Republic of the Congo": [
-      "Congo"
-    ],
-    "Congo [DRC]": [
-      "Congo"
-    ],
-    "Congo": [
-      "Congo"
-    ],
-    "Republic of the Congo": [
-      "Republic of the Congo"
-    ],
-    "Congo [Republic]": [
-      "Republic of the Congo"
-    ],
-    "East Timor": [
-      "Timor-Leste"
-    ],
-    "Timor-Leste": [
-      "Timor-Leste"
-    ],
-    "Falkland Islands": [
-      "Falkland Islands"
-    ],
-    "Falkland Islands [Islas Malvinas]": [
-      "Falkland Islands"
-    ],
-    "Gambia": [
-      "The Gambia"
-    ],
-    "The Gambia": [
-      "The Gambia"
-    ],
-    "Guinea Bissau": [
-      "Guinea-Bissau"
-    ],
-    "Guinea-Bissau": [
-      "Guinea-Bissau"
-    ],
-    "Ivory Coast": [
-      "Cote d'Ivoire"
-    ],
-    "C\u00f4te d'Ivoire": [
-      "Cote d'Ivoire"
-    ],
-    "Cote d'Ivoire": [
-      "Cote d'Ivoire"
-    ],
-    "Macedonia": [
-      "North Macedonia"
-    ],
-    "Macedonia [FYROM]": [
-      "North Macedonia"
-    ],
-    "North Macedonia": [
-      "North Macedonia"
-    ],
-    "Myanmar": [
-      "Myanmar"
-    ],
-    "Myanmar [Burma]": [
-      "Myanmar"
-    ],
-    "Republic of Serbia": [
-      "Serbia"
-    ],
-    "Serbia": [
-      "Serbia"
-    ],
-    "Somaliland": [
-      "Somalia"
-    ],
-    "Somalia": [
-      "Somalia"
-    ],
-    "Swaziland": [
-      "Eswatini"
-    ],
-    "Eswatini": [
-      "Eswatini"
-    ],
-    "The Bahamas": [
-      "The Bahamas"
-    ],
-    "Bahamas": [
-      "The Bahamas"
-    ],
-    "United Republic of Tanzania": [
-      "Tanzania"
-    ],
-    "Tanzania": [
-      "Tanzania"
-    ],
-    "United States of America": [
-      "United States of America"
-    ],
-    "United States": [
-      "United States of America"
-    ],
-    "West Bank": [
-      "Palestine"
-    ],
-    "Palestinian Territories": [
-      "Palestine"
-    ],
-    "Palestine": [
-      "Palestine"
-    ]
+    "Democratic Republic of the Congo": "Congo",
+    "Congo [DRC]": "Congo",
+    "Congo": "Congo",
+    "Republic of the Congo": "Republic of the Congo",
+    "Congo [Republic]": "Republic of the Congo",
+    "East Timor": "Timor-Leste",
+    "Timor-Leste": "Timor-Leste",
+    "Falkland Islands": "Falkland Islands",
+    "Falkland Islands [Islas Malvinas]": "Falkland Islands",
+    "Gambia": "The Gambia",
+    "The Gambia": "The Gambia",
+    "Guinea Bissau": "Guinea-Bissau",
+    "Guinea-Bissau": "Guinea-Bissau",
+    "Ivory Coast": "Cote d'Ivoire",
+    "C\u00f4te d'Ivoire": "Cote d'Ivoire",
+    "Cote d'Ivoire": "Cote d'Ivoire",
+    "Macedonia": "North Macedonia",
+    "Macedonia [FYROM]": "North Macedonia",
+    "North Macedonia": "North Macedonia",
+    "Myanmar": "Myanmar",
+    "Myanmar [Burma]": "Myanmar",
+    "Republic of Serbia": "Serbia",
+    "Serbia": "Serbia",
+    "Somaliland": "Somalia",
+    "Somalia": "Somalia",
+    "Swaziland": "Eswatini",
+    "Eswatini": "Eswatini",
+    "The Bahamas": "The Bahamas",
+    "Bahamas": "The Bahamas",
+    "United Republic of Tanzania": "Tanzania",
+    "Tanzania": "Tanzania",
+    "United States of America": "United States of America",
+    "United States": "United States of America",
+    "West Bank": "Palestine",
+    "Palestinian Territories": "Palestine",
+    "Palestine": "Palestine"
   }
 }
