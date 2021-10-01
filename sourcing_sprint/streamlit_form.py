@@ -407,8 +407,7 @@ if resource_dict["type"] in ["Primary source", "Processed dataset"]:
             )
             if resource_pii["pii_justification"] == "other":
                 resource_pii["pii_justification_other"] = st.text_area(
-                    label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
-                    help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
+                    label=f"If there is another reason for this resource not containing PII, please state why in the textbox below.",
                     key="processed_justification_other"
                 )
         resource_dict["resource_pii"] = resource_pii
@@ -601,15 +600,22 @@ if resource_dict["type"] in ["Primary source", "Processed dataset"]:
             "Please estimate the amount of data in the dataset"
         )
         media_amount = {}
-        media_amount["media_count"] = st.text_input(
+        media_amount["media_count"] = st.selectbox(
             label="Please estimate the number of instances in the dataset",
+            options=["", "n<1K", "1K<n<10K", "10K<n<100K", "100K<n<1M", "1M<n<10M", "10M<n<100M", "100M<n<1B", "n>1B"]
         )
-        media_amount["media_instance"] = st.text_input(
+        media_amount["media_instance"] = st.selectbox(
             label="Please describe what an instance consists of",
-            help="Instances may consist of sentences, posts, or larger units like paragraphs."
+            help="Instances may consist of sentences, posts, or larger units like paragraphs.",
+            options=["", "tokens", "sentences", "posts", "paragraphs", "documents", "other"]
         )
-        media_amount["media_instance_words"] = st.text_input(
+        if media_amount["media_instance"] == "other":
+            media_amount["media_instance"] = st.text_input(
+                label="You entered `other` for the instance description. Please provide a description.",
+            )
+        media_amount["media_instance_words"] = st.selectbox(
             label="Please estimate the number of words per instance",
+            options=["", "n<10", "10<n<25", "25<n<50", "n>50"]
         )
         resource_dict["media_amount"] = media_amount
 
