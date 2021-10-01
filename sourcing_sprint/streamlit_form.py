@@ -1,5 +1,9 @@
+import folium
 import json
+import pandas as pd
 import streamlit as st
+
+from streamlit_folium import folium_static
 
 ##################
 ## resources
@@ -79,18 +83,36 @@ You will be asked to fill in information about the dataset object itself as well
 (e.g. Wikipedia, or news sites for most summarization datasets).
 - *Partner organization*:
 """
-resource_dict["type"] = st.sidebar.radio(
-    label="What resource type are you submitting?",
-    options=["Primary source", "Processed dataset", "Partner organization"],
-    help=resource_type_help,
-)
 
-form_col, _, display_col = st.columns([10, 1, 7])
+st.markdown("---\n##### What would you like to use this app for?")
+add_col, viz_col, val_col = st.columns([1, 1, 1])
+add_mode_button = add_col.button("Add a new entry")
+viz_mode = viz_col.button("Explore the current catalogue")
+val_mode = val_col.button("Validate an existing entry")
+add_mode = add_mode_button or not (val_mode or viz_mode)
+if add_mode:
+    col_sizes = [100, 70, 1, 1, 1]
+if viz_mode:
+    col_sizes = [5, 1, 100, 1, 1]
+if val_mode:
+    col_sizes = [5, 1, 1, 100, 1]
 
-form_col.markdown("## New catalogue entry: input form\n --- \n")
+st.markdown("---\n")
 
-form_col.markdown("### Name, ID, Homepage, Description")
-with form_col.expander("General information"):
+form_col, display_col, viz_col, val_col, _ = st.columns(col_sizes)
+
+if add_mode:
+    form_col.markdown("### Name, ID, Homepage, Description")
+
+with form_col.expander(
+    "General information" if add_mode else "",
+    expanded = add_mode,
+):
+    resource_dict["type"] = st.radio(
+        label="What resource type are you submitting?",
+        options=["Primary source", "Processed dataset", "Partner organization"],
+        help=resource_type_help,
+    )
     resource_dict["name"] = st.text_input(
         label=f"Provide a descriptive name for the resource",
         help="This should be a human-readable name such as e.g. **Le Monde newspaper** (primary source), **EXAMS QA dataset** (processed dataset), or **Creative Commons** (partner organization)",
@@ -108,9 +130,13 @@ with form_col.expander("General information"):
         help="Describe the resource in a few words to a few sentences, the description will be used to index and navigate the catalogue",
     )
 
-form_col.markdown("### Languages and locations")
+if add_mode:
+    form_col.markdown("### Languages and locations")
 
-with form_col.expander("Languages"):
+with form_col.expander(
+    "Languages" if add_mode else "",
+    expanded = add_mode,
+):
     st.write("Add all of the languages that are covered by the resource (see 'Add language' checkbox)")
     resource_languages = []
     buttons_lang = [False for _ in range(MAX_LANGS + 1)]
@@ -145,7 +171,10 @@ with form_col.expander("Languages"):
             buttons_lang[lni + 1] = st.checkbox(f"Add language {lni+2}")
     resource_dict["languages"] = [(gr, ln) for gr, ln in resource_languages if gr != ""]
 
-with form_col.expander("Locations"):
+with form_col.expander(
+    "Locations" if add_mode else "",
+    expanded = add_mode,
+):
     st.write("Location of the aggregated resource:")
     resource_dict["resource_location"] = st.selectbox(
         label="Where is the resource or organization itself located or hosted?",
@@ -170,8 +199,12 @@ with form_col.expander("Locations"):
                 resource_dict["language_locations"] += [lang_loc]
 
 if resource_dict["type"] == "Primary source":
-    form_col.markdown("### Primary source availability")
-    with form_col.expander("Obtaining the data: online availability and data owner/custodian"):
+    if add_mode:
+        form_col.markdown("### Primary source availability")
+    with form_col.expander(
+        "Obtaining the data: online availability and data owner/custodian" if add_mode else "",
+        expanded = add_mode,
+    ):
         st.markdown("---\n#### Availability for download")
         resource_dict["available_for_download"] = st.radio(
             label="Can the data be obtained online?",
@@ -221,7 +254,10 @@ if resource_dict["type"] == "Primary source":
             help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists."
         )
 
-    with form_col.expander("Data licenses and Terms of Service"):
+    with form_col.expander(
+        "Data licenses and Terms of Service" if add_mode else "",
+        expanded = add_mode,
+    ):
         resource_dict["resource_licenses"] = []
         st.write("Please provide as much information as you can find about the data's licensing and terms of use:")
         resource_dict["has_licenses"] = st.radio(
@@ -250,7 +286,10 @@ if resource_dict["type"] == "Primary source":
         else:
             st.write("TODO: what do we do for nonexistent or unclear licenses?")
 
-    with form_col.expander("Personal Identifying Information"):
+    with form_col.expander(
+        "Personal Identifying Information" if add_mode else "",
+        expanded = add_mode,
+    ):
         #st.write("TODO: Risk of PII - category and justificaction (cat + string)")
         resource_pii = {}
         st.write("Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:")
@@ -287,8 +326,12 @@ if resource_dict["type"] == "Primary source":
                 )
         resource_dict["resource_pii"] = resource_pii
 
-    form_col.markdown("### Primary source type")
-    with form_col.expander("Source category"):
+    if add_mode:
+        form_col.markdown("### Primary source type")
+    with form_col.expander(
+        "Source category" if add_mode else "",
+        expanded = add_mode,
+    ):
         primary_tax_top = st.radio(
             label="Is the resource best described as a:",
             options=["collection", "website", "other"],
@@ -321,8 +364,12 @@ if resource_dict["type"] == "Primary source":
             )
         resource_dict["primary_source_type"] = (primary_tax_top, primary_tax_web, primary_tax_col)
 
-    form_col.markdown("### Media type, format, size, and processing needs")
-    with form_col.expander("Media type"):
+    if add_mode:
+        form_col.markdown("### Media type, format, size, and processing needs")
+    with form_col.expander(
+        "Media type" if add_mode else "",
+        expanded=add_mode,
+    ):
         st.write("Please provide information about the format of the language data")
         media_type = {}
         primary_media = st.radio(
@@ -391,7 +438,10 @@ if resource_dict["type"] == "Primary source":
             media_type["image_format"] = primary_media_image
         resource_dict["media_type"] = media_type
 
-    with form_col.expander("Media amounts"):
+    with form_col.expander(
+        "Media amounts" if add_mode else "",
+        expanded=add_mode,
+    ):
         st.write(
             "Please estimate the amount of data in the dataset"
         )
@@ -409,8 +459,9 @@ if resource_dict["type"] == "Primary source":
         resource_dict["media_amount"] = media_amount
 
 if resource_dict["type"] == "Processed dataset":
-    form_col.markdown("### Processed dataset availability")
-    with form_col.expander("Obtaining the data: online availability and data owner/custodian"):
+    if add_mode:
+        form_col.markdown("### Processed dataset availability")
+    with form_col.expander("Obtaining the data: online availability and data owner/custodian" if add_mode else ""):
         st.markdown("---\n#### Availability for download")
         resource_dict["available_for_download"] = st.radio(
             label="Can the data be obtained online?",
@@ -460,7 +511,7 @@ if resource_dict["type"] == "Processed dataset":
             help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists."
         )
 
-    with form_col.expander("Data licenses and Terms of Service"):
+    with form_col.expander("Data licenses and Terms of Service" if add_mode else ""):
         resource_dict["resource_licenses"] = []
         st.write("Please provide as much information as you can find about the data's licensing and terms of use:")
         resource_dict["has_licenses"] = st.radio(
@@ -489,7 +540,7 @@ if resource_dict["type"] == "Processed dataset":
         else:
             st.write("TODO: what do we do for nonexistent or unclear licenses?")
 
-    with form_col.expander("Personal Identifying Information"):
+    with form_col.expander("Personal Identifying Information" if add_mode else ""):
         resource_pii = {}
         st.write("Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:")
         resource_pii["has_pii"] = st.radio(
@@ -525,8 +576,9 @@ if resource_dict["type"] == "Processed dataset":
                 )
         resource_dict["resource_pii"] = resource_pii
 
-    form_col.markdown("### Primary sources of processed dataset")
-    with form_col.expander("List primary sources"):
+    if add_mode:
+        form_col.markdown("### Primary sources of processed dataset")
+    with form_col.expander("List primary sources" if add_mode else ""):
         processed_sources = {}
         st.write("Please provide as much information as you can find about the data's primary sources:")
         processed_sources["has_docs"] = st.radio(
@@ -587,8 +639,12 @@ if resource_dict["type"] == "Processed dataset":
         resource_dict["processed_sources"] = processed_sources
 
 if resource_dict["type"] == "Partner organization":
-    form_col.markdown("### Partner Information")
-    with form_col.expander("Data owner/custodian"):
+    if add_mode:
+        form_col.markdown("### Partner Information")
+    with form_col.expander(
+        "Data owner/custodian" if add_mode else "",
+        expanded=add_mode,
+    ):
         st.markdown("#### Information about the data owners/custodians")
         resource_dict["owner_type"] = st.selectbox(
             label="Is the data owner/custodian:",
@@ -623,11 +679,21 @@ if resource_dict["type"] == "Partner organization":
             help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists."
         )
 
-display_col.markdown("## New catalogue entry: save output\n --- \n")
-display_col.download_button(
-    label="Download output as `json`",
-    data=json.dumps(resource_dict, indent=2),
-    file_name="resource_entry.json" if resource_dict["uid"] == "" else f"{resource_dict['uid']}_entry.json",
-)
-display_col.markdown(f"You are entering a new resource of type: *{resource_dict['type']}*")
-display_col.write(resource_dict)
+if add_mode:
+    with display_col.expander(
+        "Show current entry" if add_mode else "",
+        expanded=add_mode
+    ):
+        st.download_button(
+            label="Download output as `json`",
+            data=json.dumps(resource_dict, indent=2),
+            file_name="resource_entry.json" if resource_dict["uid"] == "" else f"{resource_dict['uid']}_entry.json",
+        )
+        st.markdown(f"You are entering a new resource of type: *{resource_dict['type']}*")
+        st.write(resource_dict)
+
+if viz_mode:
+    viz_col.write("TODO: add visualization of catalogue")
+
+if val_mode:
+    val_col.write("TODO: add form to select and validate existing entry")
