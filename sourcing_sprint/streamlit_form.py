@@ -14,37 +14,26 @@ from streamlit_folium import folium_static
 
 ### Countries and languages
 # from Wikipedia and https://unstats.un.org/unsd/methodology/m49/
-regions, countries, region_tree = json.load(open("unstats_regions_countries.json", encoding="utf-8"))
-country_centers = json.load(open("country_center_coordinates.json", encoding="utf-8"))
-country_mappings = json.load(open("country_mappings.json", encoding="utf-8"))
+regions, countries, region_tree = json.load(open("resources/country_regions.json", encoding="utf-8"))
+country_centers = json.load(open("resources/country_center_coordinates.json", encoding="utf-8"))
+country_mappings = json.load(open("resources/country_mappings.json", encoding="utf-8"))
 
-bcp_47 = json.load(open("bcp47.json", encoding="utf-8"))
+bcp_47 = json.load(open("resources/bcp47.json", encoding="utf-8"))
 bcp_47_langs = [x for x in bcp_47["subtags"] if x["type"] == "language"]
 
-language_lists = json.load(open("language_lists.json", encoding="utf-8"))
+language_lists = json.load(open("resources/language_lists.json", encoding="utf-8"))
 MAX_LANGS = 25
 MAX_COUNTRIES = 25
 
 ### Primary source categories
-primary_taxonomy = json.load(open("primary_source_taxonomy.json", encoding="utf-8"))
+primary_taxonomy = json.load(open("resources/primary_source_taxonomy.json", encoding="utf-8"))
 MAX_SOURCES = 25
 
 # from Data Tooling docs
-pii_categories = json.load(open("pii_categories.json", encoding="utf-8"))
+pii_categories = json.load(open("resources/pii_categories.json", encoding="utf-8"))
 MAX_PII = 25
 
-resource_dict = {
-    "type": "",
-    "name": "",
-    "uid": "",
-    "homepage": "",
-    "description": "",
-    "languages": [],
-    "resource_location": "",
-    "language_locations": [],
-}
-
-licenses = json.load(open("licenses.json", encoding="utf-8"))
+licenses = json.load(open("resources/licenses.json", encoding="utf-8"))
 MAX_LICENSES = 25
 
 ##################
@@ -92,9 +81,6 @@ class MarkerWithProps(Marker):
         super(MarkerWithProps, self).__init__(location=location,popup=popup,tooltip=tooltip,icon=icon,draggable=draggable)
         self.props = json.loads(json.dumps(props))
 
-country_centers = json.load(open("country_center_coordinates.json", encoding="utf-8"))
-country_mappings = json.load(open("country_mappings.json", encoding="utf-8"))
-
 @st.cache(allow_output_mutation=True)
 def make_choro_map(resource_counts, marker_thres=0):
     world_map = folium.Map(tiles="cartodbpositron", location=[0,0], zoom_start=1.5)
@@ -128,6 +114,17 @@ def make_choro_map(resource_counts, marker_thres=0):
 ##################
 ## streamlit
 ##################
+resource_dict = {
+    "type": "",
+    "name": "",
+    "uid": "",
+    "homepage": "",
+    "description": "",
+    "languages": [],
+    "resource_location": "",
+    "language_locations": [],
+}
+
 st.set_page_config(
     page_title="BigScience Language Resource Catalogue Input Form",
     page_icon="https://avatars.githubusercontent.com/u/82455566",
