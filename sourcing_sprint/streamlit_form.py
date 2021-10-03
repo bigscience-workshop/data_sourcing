@@ -750,9 +750,24 @@ with val_col.expander(
     "Select catalogue entry to validate" if val_mode else "",
     expanded=val_mode,
 ):
-    st.write(
-        "TODO: either propose an entry that still needs to be validate, or let the user navigate and find one themselves"
+    catalogue_list = [json.load(open(fname, encoding="utf-8")) for fname in glob("entries/*.json")]
+    catalogue = dict([(dct["uid"], dct) for dct in catalogue_list])
+    catalogue[''] = {
+        "uid": "",
+        "type": "",
+        "description": {
+            "name": "",
+            "description": "",
+        },
+    }
+    entry_id = st.selectbox(
+        label="Select an entry to validate from the existing catalogue",
+        options=catalogue,
+        format_func=lambda x: catalogue[x]['description']['name'],
+        index=len(catalogue)-1,
     )
+    entry_dict = catalogue[entry_id]
+    st.markdown(f"##### Validating: {entry_types.get(entry_dict['type'], '')} - {entry_dict['description']['name']}\n\n{entry_dict['description']['description']}")
 
 if val_mode:
     val_col.markdown("### Entry Category, Name, ID, Homepage, Description")
