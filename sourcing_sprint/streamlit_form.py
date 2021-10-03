@@ -6,7 +6,9 @@ import pandas as pd
 import streamlit as st
 from folium import Marker
 from folium.plugins import MarkerCluster
+from glob import glob
 from jinja2 import Template
+from os.path import isfile
 from streamlit_folium import folium_static
 
 ##################
@@ -388,8 +390,11 @@ if entry_dict["type"] in ["primary", "processed"]:
         },
         "pii": {
             "has_pii": "",
-            "general_pii_list": [],
+            "generic_pii_likely": "",
+            "generic_pii_list": [],
+            "numeric_pii_likely": "",
             "numeric_pii_list": [],
+            "sensitive_pii_likely": "",
             "sensitive_pii_list": [],
             "no_pii_justification_class": "",
             "no_pii_justification_text": "",
@@ -477,21 +482,39 @@ if entry_dict["type"] in ["primary", "processed"]:
             st.markdown(
                 "If the resource does contain personally identifiable or sensitive information, please select what types are likely to be present:"
             )
-            entry_dict["availability"]["pii"]["general_pii_list"] = st.multiselect(
-                label=f"What type of generic PII (e.g. names, emails, etc,) does the resource contain?",
-                options=pii_categories["general"],
-                help="E.g.: Does the resource contain names, birth dates, or personal life details?",
+            entry_dict["availability"]["pii"]["generic_pii_likely"] = st.selectbox(
+                label="How likely is the data to contain instances of generic PII, such as names or addresses?",
+                options=["", "very likely", "somewhat likely", "unlikely", "none"],
+                help=f"Generic PII includes {', '.join(pii_categories['generic'])}"
             )
-            entry_dict["availability"]["pii"]["numeric_pii_list"] = st.multiselect(
-                label=f"What type of numeric PII (e.g. phone numbers, social security numbers, etc.) does the resource contain?",
-                options=pii_categories["numbers"],
-                help="E.g.: Does the resource contain phone numbers, credit card numbers, or other numbers?",
+            if "likely" in entry_dict["availability"]["pii"]["generic_pii_likely"]:
+                entry_dict["availability"]["pii"]["generic_pii_list"] = st.multiselect(
+                    label=f"What type of generic PII (e.g. names, emails, etc,) is the data most likely to contain?",
+                    options=pii_categories["generic"],
+                    help="E.g.: Does the resource contain names, birth dates, or personal life details?",
+                )
+            entry_dict["availability"]["pii"]["numeric_pii_likely"] = st.selectbox(
+                label="How likely is the data to contain instances of numeric PII, such as phone or social security numbers?",
+                options=["", "very likely", "somewhat likely", "unlikely", "none"],
+                help=f"Numeric PII includes {', '.join(pii_categories['numbers'])}"
             )
-            entry_dict["availability"]["pii"]["sensitive_pii_list"] = st.multiselect(
-                label=f"What type of sensitive PII (e.g. health status, poilitcal opinions, sexual orientation, etc.) does the resource contain?",
-                options=pii_categories["sensitive"],
-                help="E.g.: Does the resource contain sensitive data?",
+            if "likely" in entry_dict["availability"]["pii"]["numeric_pii_likely"]:
+                entry_dict["availability"]["pii"]["numeric_pii_list"] = st.multiselect(
+                    label=f"What type of numeric PII (e.g. phone numbers, social security numbers, etc.) is the data most likely to contain?",
+                    options=pii_categories["numbers"],
+                    help="E.g.: Does the resource contain phone numbers, credit card numbers, or other numbers?",
+                )
+            entry_dict["availability"]["pii"]["sensitive_pii_likely"] = st.selectbox(
+                label="How likely is the data to contain instances of Sensitive PII, such as health status or political beliefs?",
+                options=["", "very likely", "somewhat likely", "unlikely", "none"],
+                help=f"Sensitive PII includes {', '.join(pii_categories['sensitive'])}"
             )
+            if "likely" in entry_dict["availability"]["pii"]["sensitive_pii_likely"]:
+                entry_dict["availability"]["pii"]["sensitive_pii_list"] = st.multiselect(
+                    label=f"What type of sensitive PII (e.g. health status, poilitcal opinions, sexual orientation, etc.) is the data most likely to contain?",
+                    options=pii_categories["sensitive"],
+                    help="E.g.: Does the resource contain sensitive data?",
+                )
         else:
             entry_dict["availability"]["pii"]["no_pii_justification_class"] = st.radio(
                 label="What is the justification for assuming that this resource does not contain any personally identifiable information?",
@@ -686,7 +709,7 @@ if add_mode:
         st.download_button(
             label="Download output as `json`",
             data=json.dumps(entry_dict, indent=2),
-            file_name="resource_entry.json" if entry_dict["uid"] == "" else f"{entry_dict['uid']}_entry.json",
+            file_name="default_entry_name.json" if entry_dict["uid"] == "" else f"{entry_dict['uid']}.json",
         )
         st.markdown(f"You are entering a new resource of type: *{entry_dict['type']}*")
         st.write(entry_dict)

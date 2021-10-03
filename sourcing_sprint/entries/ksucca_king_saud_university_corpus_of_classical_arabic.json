@@ -1,0 +1,87 @@
+{
+  "uid": "ksucca_king_saud_university_corpus_of_classical_arabic",
+  "type": "processed",
+  "description": {
+    "name": "KSUCCA King Saud University Corpus of Classical Arabic",
+    "description": "King Saud University Corpus of Classical Arabic (KSUCCA) is a pioneering 50 million tokens annotated corpus of Classical Arabic texts from the period of pre-Islamic era until the fourth Hijri century (equivalent to the period from the seventh until early eleventh century CE), which is the period of pure classical Arabic. The main aim of this corpus is to be used for studying the distributional lexical semantics of The Quran words. However, it can be used for other research purposes, such as:\n\u2022 Arabic linguistics, which includes: lexical, morphological, syntactic, semantic and pragmatic research.\n\u2022 Arabic computational linguistics, which includes: lexical, morphological, syntactic, semantic and pragmatic research including their various applications.\n\u2022 Arabic language teaching for both Arabs and non Arabs.\n\u2022 Artificial intelligence.\n\u2022 Natural language processing.\n\u2022 Information retrieval.\n\u2022 Question answering.\n\u2022 Machine translation.",
+    "homepage": "https://sourceforge.net/projects/ksucca-corpus/",
+    "validated": true
+  },
+  "languages": {
+    "language_names": [
+      "Arabic",
+      "ar-CLS"
+    ],
+    "language_comments": "Historical Arabic texts from the seventh until early eleventh century CE",
+    "language_locations_region": [
+      "Northern Africa",
+      "Western Asia"
+    ],
+    "language_locations_nation": [],
+    "validated": false
+  },
+  "custodian": {
+    "name": "King Saud University",
+    "type": "A university or research institution",
+    "location": "Saudi Arabia",
+    "contact_name": "Maha Alrabiah",
+    "contact_email": "msrabiah@gmail.com",
+    "contact_submitter": true,
+    "additional": "https://www.ksu.edu.sa/en/",
+    "validated": false
+  },
+  "availability": {
+    "procurement": {
+      "for_download": "Yes - it has a direct download link or links",
+      "download_url": "https://sourceforge.net/projects/ksucca-corpus/",
+      "download_email": ""
+    },
+    "licensing": {
+      "has_licenses": "Yes",
+      "license_text": "",
+      "license_properties": [
+        "open license",
+        "non-commercial use"
+      ],
+      "license_list": [
+        "cc-by-nc-2.0: Creative Commons Attribution Non Commercial 2.0 Generic"
+      ]
+    },
+    "pii": {
+      "has_pii": "No",
+      "generic_pii_likely": "",
+      "generic_pii_list": [],
+      "numeric_pii_likely": "",
+      "numeric_pii_list": [],
+      "sensitive_pii_likely": "",
+      "sensitive_pii_list": [],
+      "no_pii_justification_class": "other",
+      "no_pii_justification_text": "historical texts that are more than 100 years old"
+    },
+    "validated": false
+  },
+  "processed_from_primary": {
+    "from_primary": "Taken from primary source",
+    "primary_availability": "Yes - their documentation/homepage/description is available",
+    "primary_license": "Yes - the source material has an open license that allows re-use",
+    "primary_types": [
+      "books/book publisher"
+    ],
+    "validated": false
+  },
+  "media": {
+    "category": [
+      "text"
+    ],
+    "text_format": [
+      "plain text"
+    ],
+    "audiovisual_format": [],
+    "image_format": [],
+    "text_is_transcribed": "No",
+    "instance_type": "book",
+    "instance_count": "100<n<1K",
+    "instance_size": "n>10,000",
+    "validated": false
+  }
+}

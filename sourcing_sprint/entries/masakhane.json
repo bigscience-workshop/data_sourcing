@@ -1,0 +1,45 @@
+{
+  "uid": "masakhane",
+  "type": "organization",
+  "description": {
+    "name": "Masakhane",
+    "description": "Masakhane is a grassroots organisation whose mission is to strengthen and spur NLP research in African languages, for Africans, by Africans. Despite the fact that 2000 of the world\u2019s languages are African, African languages are barely represented in technology. The tragic past of colonialism has been devastating for African languages in terms of their support, preservation and integration. This has resulted in technological space that does not understand our names, our cultures, our places, our history. \n\nMasakhane roughly translates to \u201cWe build together\u201d in isiZulu. Our goal is for Africans to shape and own these technological advances towards human dignity, well-being and equity, through inclusive community building, open participatory research and multidisciplinarity.",
+    "homepage": "https://www.masakhane.io/",
+    "validated": true
+  },
+  "languages": {
+    "language_names": [
+      "English",
+      "French",
+      "Niger-Congo",
+      "Yoruba",
+      "ChiShona",
+      "Fon",
+      "Igbo",
+      "isiZulu",
+      "Kinyarwanda",
+      "Kirundi",
+      "Lingala",
+      "Swahili",
+      "Xhosa",
+      "Twi",
+      "Wolof"
+    ],
+    "language_comments": "",
+    "language_locations_region": [
+      "Africa"
+    ],
+    "language_locations_nation": [],
+    "validated": false
+  },
+  "custodian": {
+    "name": "Masakhane",
+    "type": "A nonprofit/NGO (other)",
+    "location": "Kenya",
+    "contact_name": "Jade Abott",
+    "contact_email": "masakhanetranslation@gmail.com",
+    "contact_submitter": true,
+    "additional": "https://www.masakhane.io/",
+    "validated": false
+  }
+}

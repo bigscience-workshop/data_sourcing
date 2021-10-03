@@ -1,0 +1,93 @@
+{
+  "uid": "le_monde_newspaper",
+  "type": "primary",
+  "description": {
+    "name": "Le Monde Newspaper",
+    "description": "Le Monde is a French daily afternoon newspaper. It is the main publication of Le Monde Group and reported an average circulation of 323,039 copies per issue in 2009, about 40,000 of which were sold abroad. It has had its own website since 19 December 1995, and is often the only French newspaper easily obtainable in non-French-speaking countries. It is considered one of the French newspapers of record, along with Lib\u00e9ration, and Le Figaro. It should not be confused with the monthly publication Le Monde diplomatique, of which Le Monde has 51% ownership, but which is editorially independent. A Reuters Institute poll in 2021 in France found that \"Le Monde is the most trusted national newspaper\".",
+    "homepage": "https://www.lemonde.fr/",
+    "validated": true
+  },
+  "languages": {
+    "language_names": [
+      "French"
+    ],
+    "language_comments": "",
+    "language_locations_region": [],
+    "language_locations_nation": [
+      "France"
+    ],
+    "validated": false
+  },
+  "custodian": {
+    "name": "Le Monde Group",
+    "type": "A commercial entity",
+    "location": "France",
+    "contact_name": "Sacha Morard",
+    "contact_email": "droitsdauteur@lemonde.fr",
+    "contact_submitter": true,
+    "additional": "https://fr.wikipedia.org/wiki/Groupe_Le_Monde",
+    "validated": false
+  },
+  "availability": {
+    "procurement": {
+      "for_download": "No - we would need to spontaneously reach out to the current owners/custodians",
+      "download_url": "morard@lemonde.fr",
+      "download_email": ""
+    },
+    "licensing": {
+      "has_licenses": "Yes",
+      "license_text": "https://moncompte.lemonde.fr/cgv#ancre_propriete\n\nLe Monde est titulaire des droits de propri\u00e9t\u00e9 intellectuelle sur tous les \u00e9l\u00e9ments qui composent ses publications, ses Produits et/ou Services et ses supports de communication, tels que texte, photographie, image, infographie, dessins, logo, enregistrement phonographique ou vid\u00e9ographique, format \u00e9ditorial, charte graphique, programme informatique ou toute autre cr\u00e9ation ou \u0153uvre prot\u00e9geable, ou s\u2019est vu conc\u00e9der les licences n\u00e9cessaires sur les droits de propri\u00e9t\u00e9 intellectuelle y aff\u00e9rents.\n\nQu\u2019ils soient accessibles gratuitement ou non, toute reproduction, repr\u00e9sentation, diffusion, traduction ou exploitation totale ou partielle, de quelque nature que ce soit et par quelque moyen que ce soit, de l\u2019un quelconque de ces \u00e9l\u00e9ments, sans l\u2019autorisation \u00e9crite et pr\u00e9alable du Monde, est strictement interdite et constituerait, au regard des articles L. 335-2 du Code de la propri\u00e9t\u00e9 intellectuelle, un d\u00e9lit de contrefa\u00e7on passible de trois ans d\u2019emprisonnement et 300 000 \u20ac d\u2019amende.\n\nLe Monde est en outre propri\u00e9taire exclusif des marques qu\u2019il a d\u00e9pos\u00e9es ou exploite r\u00e9guli\u00e8rement. Leur reproduction, usage ou apposition sans l\u2019autorisation \u00e9crite et pr\u00e9alable du Monde, est strictement interdite et constituerait un acte de contrefa\u00e7on engageant la responsabilit\u00e9 civile de son auteur au titre de l\u2019article L. 716-1 du Code de la propri\u00e9t\u00e9 intellectuelle.\n\nL\u2019utilisation ou l\u2019achat d\u2019un Produit et/ou Service par un Utilisateur et/ou Client ne saurait conf\u00e9rer \u00e0 celui-ci comme \u00e0 quiconque, sur les \u00e9l\u00e9ments prot\u00e9g\u00e9s susvis\u00e9s, un droit autre que celui d\u2019un usage strictement personnel, non collectif et non marchand. Pour toute demande d\u2019autorisation relative aux \u00e9l\u00e9ments de propri\u00e9t\u00e9 intellectuelle du Monde, merci de contacter le service commercial du Monde \u00e0 l\u2019adresse \u00e9lectronique suivante : droitsdauteur@lemonde.fr.",
+      "license_properties": [
+        "copyright - all rights reserved"
+      ],
+      "license_list": [
+        "other: Other license"
+      ]
+    },
+    "pii": {
+      "has_pii": "Yes",
+      "generic_pii_likely": "very likely",
+      "generic_pii_list": [
+        "names",
+        "dates (birth, death, etc.)"
+      ],
+      "numeric_pii_likely": "somewhat likely",
+      "numeric_pii_list": [
+        "telephone numbers"
+      ],
+      "sensitive_pii_likely": "very likely",
+      "sensitive_pii_list": [
+        "political opinions",
+        "racial or ethnic origin",
+        "health-related data",
+        "religious or philosophical beliefs"
+      ],
+      "no_pii_justification_class": "",
+      "no_pii_justification_text": ""
+    },
+    "validated": false
+  },
+  "source_category": {
+    "category_type": "collection",
+    "category_web": "",
+    "category_media": "news articles",
+    "validated": false
+  },
+  "media": {
+    "category": [
+      "text"
+    ],
+    "text_format": [
+      "plain text",
+      "HTML",
+      "PDF"
+    ],
+    "audiovisual_format": [],
+    "image_format": [],
+    "text_is_transcribed": "No",
+    "instance_type": "article",
+    "instance_count": "10K<n<100K",
+    "instance_size": "100<n<10,000",
+    "validated": false
+  }
+}
