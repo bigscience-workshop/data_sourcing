@@ -1,9 +1,9 @@
-import folium
 import json
-import pandas as pd
 import re
-import streamlit as st
 
+import folium
+import pandas as pd
+import streamlit as st
 from folium import Marker
 from folium.plugins import MarkerCluster
 from jinja2 import Template
@@ -40,9 +40,11 @@ MAX_LICENSES = 25
 ##################
 ## Mapping functions
 ##################
-WORLD_GEO_URL = "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/world-countries.json"
+WORLD_GEO_URL = (
+    "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/world-countries.json"
+)
 
-ICON_CREATE_FUNCTIOM = '''
+ICON_CREATE_FUNCTIOM = """
     function(cluster) {
         var markers = cluster.getAllChildMarkers();
         var sum = 0;
@@ -56,10 +58,12 @@ ICON_CREATE_FUNCTIOM = '''
              iconSize: new L.Point(20, 20)
         });
     }
-'''
+"""
+
 
 class MarkerWithProps(Marker):
-    _template = Template(u"""
+    _template = Template(
+        """
         {% macro script(this, kwargs) %}
         var {{this.get_name()}} = L.marker(
             [{{this.location[0]}}, {{this.location[1]}}],
@@ -76,40 +80,44 @@ class MarkerWithProps(Marker):
             )
             .addTo({{this._parent.get_name()}});
         {% endmacro %}
-        """)
-    def __init__(self, location, popup=None, tooltip=None, icon=None,
-                 draggable=False, props = None):
-        super(MarkerWithProps, self).__init__(location=location,popup=popup,tooltip=tooltip,icon=icon,draggable=draggable)
+        """
+    )
+
+    def __init__(self, location, popup=None, tooltip=None, icon=None, draggable=False, props=None):
+        super(MarkerWithProps, self).__init__(
+            location=location, popup=popup, tooltip=tooltip, icon=icon, draggable=draggable
+        )
         self.props = json.loads(json.dumps(props))
+
 
 @st.cache(allow_output_mutation=True)
 def make_choro_map(resource_counts, marker_thres=0):
-    world_map = folium.Map(tiles="cartodbpositron", location=[0,0], zoom_start=1.5)
+    world_map = folium.Map(tiles="cartodbpositron", location=[0, 0], zoom_start=1.5)
     marker_cluster = MarkerCluster(icon_create_function=ICON_CREATE_FUNCTIOM)
     marker_cluster.add_to(world_map)
     for name, count in resource_counts.items():
         if count > marker_thres and name in country_centers or name in country_mappings["to_center"]:
             country_center = country_centers[country_mappings["to_center"].get(name, name)]
             MarkerWithProps(
-                location = [
-                    country_center["latitude"], country_center["longitude"]],
-                popup = f"Country : {name}<br> \n Resources : {count} <br>",
-                props = {'name': name, 'resources': count},
+                location=[country_center["latitude"], country_center["longitude"]],
+                popup=f"Country : {name}<br> \n Resources : {count} <br>",
+                props={"name": name, "resources": count},
             ).add_to(marker_cluster)
     df_resource_counts = pd.DataFrame(
         [(country_mappings["to_outline"].get(n, n), c) for n, c in resource_counts.items()],
         columns=["Name", "Resources"],
     )
     folium.Choropleth(
-        geo_data = WORLD_GEO_URL,
+        geo_data=WORLD_GEO_URL,
         name="resource map",
         data=df_resource_counts,
         columns=["Name", "Resources"],
         key_on="feature.properties.name",
-        fill_color='PuRd',
-        nan_fill_color='white',
+        fill_color="PuRd",
+        nan_fill_color="white",
     ).add_to(world_map)
     return world_map
+
 
 ##################
 ## streamlit
@@ -176,13 +184,13 @@ You will be asked to fill in information about the partner organization itself a
 """
 
 entry_dict = {
-    "uid": "", # Unique Identifier string to link information and refer to the entry
-    "type": "", # in ["Primary source", "Language dataset", "Language organization"]
+    "uid": "",  # Unique Identifier string to link information and refer to the entry
+    "type": "",  # in ["Primary source", "Language dataset", "Language organization"]
     "description": {
         "name": "",
         "description": "",
         "homepage": "",  # optional
-        "validated": True, # no need to have a second person validate this part
+        "validated": True,  # no need to have a second person validate this part
     },
     "languages": {
         "language_names": [],
@@ -190,7 +198,7 @@ entry_dict = {
         "language_locations_nation": [],
         "validated": False,
     },
-    "custodian": { # for Primary source or Language daset - data owner or custodian
+    "custodian": {  # for Primary source or Language daset - data owner or custodian
         "name": "",
         "type": "",
         "location": "",
@@ -209,13 +217,13 @@ entry_types = {
 }
 with form_col.expander(
     "General information" if add_mode else "",
-    expanded = add_mode,
+    expanded=add_mode,
 ):
-    st.markdown("##### Entry name and summary") # TODO add collapsible instructions
+    st.markdown("##### Entry name and summary")  # TODO add collapsible instructions
     entry_dict["type"] = st.radio(
         label="What resource type are you submitting?",
         options=entry_types,
-        format_func=lambda x:entry_types[x],
+        format_func=lambda x: entry_types[x],
         help=resource_type_help,
     )
     entry_dict["description"]["name"] = st.text_input(
@@ -224,7 +232,7 @@ with form_col.expander(
     )
     entry_dict["uid"] = st.text_input(
         label=f"Provide a short `snake_case` unique identifier for the resource",
-        value= re.sub(r'[^\w\s]', '_', entry_dict["description"]["name"].lower()).replace(" ", "_"),
+        value=re.sub(r"[^\w\s]", "_", entry_dict["description"]["name"].lower()).replace(" ", "_"),
         help="For example `le_monde_primary`, `exams_dataset`, or `creative_commons_org`",
     )
     entry_dict["description"]["homepage"] = st.text_input(
@@ -239,7 +247,7 @@ with form_col.expander(
 form_col.markdown("### Entry Languages and Locations" if add_mode else "")
 with form_col.expander(
     "Language names and represented regions" if add_mode else "",
-    expanded = add_mode,
+    expanded=add_mode,
 ):
     language_help_text = """
     ##### Whose language is represented in the entry?
@@ -267,12 +275,12 @@ with form_col.expander(
         )
     entry_dict["languages"]["language_names"] = st.multiselect(
         label="For entries that cover languages outside of the current BigScience list, select all that apply here:",
-        options=[', '.join(x['description']) for x in bcp_47_langs],
+        options=[", ".join(x["description"]) for x in bcp_47_langs],
         help="This is a comprehensive list of languages obtained from the BCP-47 standard list, please select one using the search function",
     )
     st.markdown(
-        "In addition to the names of the languages covered by the entry, we need to know where the language creators are **primarily** located.\n" + \
-        "This information can be entered both at the level of a *cacroscopic world region* or at the level of the *country or nation*, please select all that apply."
+        "In addition to the names of the languages covered by the entry, we need to know where the language creators are **primarily** located.\n"
+        + "This information can be entered both at the level of a *cacroscopic world region* or at the level of the *country or nation*, please select all that apply."
     )
     entry_dict["languages"]["language_locations_region"] = st.multiselect(
         label="Macroscopic regions. Please select all that apply from the following",
@@ -284,57 +292,58 @@ with form_col.expander(
         options=countries + ["other"],
     )
 
-
 form_col.markdown("### Entry Representative, Owner, or Custodian" if add_mode else "")
 with form_col.expander(
-    ("Advocate or organization information" if entry_dict["type"] == "organization" else "Data owner or custodian") if add_mode else "",
-    expanded = add_mode,
+    ("Advocate or organization information" if entry_dict["type"] == "organization" else "Data owner or custodian")
+    if add_mode
+    else "",
+    expanded=add_mode,
 ):
-        st.markdown("#### Information about the entry's custodian or representative")
-        if entry_dict["type"] == "organization":
-            entry_dict["custodian"]["name"] = entry_dict["description"]["name"]
-        else:
-            entry_dict["custodian"]["name"] = st.text_input(
-                label="Please enter the name of the person or entity that owns or manages the data (data custodian)",
-            )
-        entry_dict["custodian"]["type"] = st.selectbox(
-            label="Entity type: is the organization, advocate, or data custodian...",
-            options=[
-                "",
-                "A private individual",
-                "A commercial entity",
-                "A library, museum, or archival institute",
-                "A university or research institution",
-                "A nonprofit/NGO (other)",
-                "A government organization",
-                "Unclear",
-                "other",
-            ],
+    st.markdown("#### Information about the entry's custodian or representative")
+    if entry_dict["type"] == "organization":
+        entry_dict["custodian"]["name"] = entry_dict["description"]["name"]
+    else:
+        entry_dict["custodian"]["name"] = st.text_input(
+            label="Please enter the name of the person or entity that owns or manages the data (data custodian)",
         )
-        if entry_dict["custodian"]["type"] == "other":
-            entry_dict["custodian"]["type"] = st.text_input(
-                label="You entered `other` for the entity type, how would you categorize them?",
-            )
-        entry_dict["custodian"]["location"] = st.selectbox(
-            label="Where is the entity located or hosted?",
-            options=[""] + countries,
-            help="E.g.: where does the **main author of the dataset** work, where is the **website hosted**, what is the physical **location of the library**, etc.?",
+    entry_dict["custodian"]["type"] = st.selectbox(
+        label="Entity type: is the organization, advocate, or data custodian...",
+        options=[
+            "",
+            "A private individual",
+            "A commercial entity",
+            "A library, museum, or archival institute",
+            "A university or research institution",
+            "A nonprofit/NGO (other)",
+            "A government organization",
+            "Unclear",
+            "other",
+        ],
+    )
+    if entry_dict["custodian"]["type"] == "other":
+        entry_dict["custodian"]["type"] = st.text_input(
+            label="You entered `other` for the entity type, how would you categorize them?",
         )
-        entry_dict["custodian"]["contact_name"] = st.text_input(
-            label="Please enter the name of a contact person for the entity",
-            value=entry_dict["description"]["name"],
-        )
-        entry_dict["custodian"]["contact_email"] = st.text_input(
-            label="If available, please enter an email address that can be used to ask them about using/obtaining the data:"
-        )
-        entry_dict["custodian"]["contact_submitter"] = st.checkbox(
-            label="Would you be willing to reach out to the entity to ask them about using their data (with support from the BigScience data sourcing team)?" + \
-            " If so, make sure to fill out your email in the sidebar.",
-        )
-        entry_dict["custodian"]["additional"] = st.text_input(
-            label="Where can we find more information about the data owner/custodian? Please provide a URL",
-            help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists."
-        )
+    entry_dict["custodian"]["location"] = st.selectbox(
+        label="Where is the entity located or hosted?",
+        options=[""] + countries,
+        help="E.g.: where does the **main author of the dataset** work, where is the **website hosted**, what is the physical **location of the library**, etc.?",
+    )
+    entry_dict["custodian"]["contact_name"] = st.text_input(
+        label="Please enter the name of a contact person for the entity",
+        value=entry_dict["description"]["name"],
+    )
+    entry_dict["custodian"]["contact_email"] = st.text_input(
+        label="If available, please enter an email address that can be used to ask them about using/obtaining the data:"
+    )
+    entry_dict["custodian"]["contact_submitter"] = st.checkbox(
+        label="Would you be willing to reach out to the entity to ask them about using their data (with support from the BigScience data sourcing team)?"
+        + " If so, make sure to fill out your email in the sidebar.",
+    )
+    entry_dict["custodian"]["additional"] = st.text_input(
+        label="Where can we find more information about the data owner/custodian? Please provide a URL",
+        help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists.",
+    )
 
 if entry_dict["type"] in ["primary", "processed"]:
     form_col.markdown("### Availability of the Resource: Procuring, Licenses, PII" if add_mode else "")
@@ -361,7 +370,7 @@ if entry_dict["type"] in ["primary", "processed"]:
     }
     with form_col.expander(
         "Obtaining the data: online availability and data owner/custodian" if add_mode else "",
-        expanded = add_mode,
+        expanded=add_mode,
     ):
         st.markdown("##### Availability for download")
         entry_dict["availability"]["procurement"]["for_download"] = st.radio(
@@ -370,7 +379,7 @@ if entry_dict["type"] in ["primary", "processed"]:
                 "Yes - it has a direct download link or links",
                 "Yes - after signing a user agreement",
                 "No - but the current owners/custodians have contact information for data queries",
-                "No - we would need to spontaneously reach out to the current owners/custodians"
+                "No - we would need to spontaneously reach out to the current owners/custodians",
             ],
             index=3,
         )
@@ -388,7 +397,7 @@ if entry_dict["type"] in ["primary", "processed"]:
 
     with form_col.expander(
         "Data licenses and Terms of Service" if add_mode else "",
-        expanded = add_mode,
+        expanded=add_mode,
     ):
         st.write("Please provide as much information as you can find about the data's licensing and terms of use:")
         entry_dict["availability"]["licensing"]["has_licenses"] = st.radio(
@@ -400,7 +409,9 @@ if entry_dict["type"] in ["primary", "processed"]:
                 label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
                 help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
             )
-            st.markdown("If the language data is shared under established licenses (such as e.g. **MIT license** or **CC-BY-3.0**), please select all that apply below (use the `Add license n` checkbox below if more than one):")
+            st.markdown(
+                "If the language data is shared under established licenses (such as e.g. **MIT license** or **CC-BY-3.0**), please select all that apply below (use the `Add license n` checkbox below if more than one):"
+            )
             entry_dict["availability"]["licensing"]["license_list"] = st.multiselect(
                 label=f"Under which licenses is the data shared?",
                 options=licenses,
@@ -410,16 +421,20 @@ if entry_dict["type"] in ["primary", "processed"]:
 
     with form_col.expander(
         "Personal Identifying Information" if add_mode else "",
-        expanded = add_mode,
+        expanded=add_mode,
     ):
-        st.write("Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:")
+        st.write(
+            "Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:"
+        )
         entry_dict["availability"]["pii"]["has_pii"] = st.radio(
             label="Does the language data in the resource contain personally identifiable or sensitive information?",
             help="See the guide for descriptions and examples. The default answer should be 'Yes'. Answers of 'No' and 'Unclear' require justifications.",
             options=["Yes", "Yes - text author name only", "No", "Unclear"],
         )
         if entry_dict["availability"]["pii"]["has_pii"] == "Yes":
-            st.markdown("If the resource does contain personally identifiable or sensitive information, please select what types are likely to be present:")
+            st.markdown(
+                "If the resource does contain personally identifiable or sensitive information, please select what types are likely to be present:"
+            )
             entry_dict["availability"]["pii"]["general_pii_list"] = st.multiselect(
                 label=f"What type of generic PII (e.g. names, emails, etc,) does the resource contain?",
                 options=pii_categories["general"],
@@ -447,7 +462,7 @@ if entry_dict["type"] in ["primary", "processed"]:
             if entry_dict["availability"]["pii"]["no_pii_justification_class"] == "other":
                 entry_dict["availability"]["pii"]["no_pii_justification_text"] = st.text_area(
                     label=f"If there is another reason for this resource not containing PII, please state why in the textbox below.",
-                    key="processed_justification_other"
+                    key="processed_justification_other",
                 )
 
 if entry_dict["type"] == "primary":
@@ -460,7 +475,7 @@ if entry_dict["type"] == "primary":
     }
     with form_col.expander(
         "Source category" if add_mode else "",
-        expanded = add_mode,
+        expanded=add_mode,
     ):
         primary_tax_top = st.selectbox(
             label="Is the resource best described as a:",
@@ -507,7 +522,7 @@ if entry_dict["type"] == "processed":
     }
     with form_col.expander(
         "List primary sources" if add_mode else "",
-        expanded = add_mode,
+        expanded=add_mode,
     ):
         processed_sources = {}
         st.write("Please provide as much information as you can find about the data's primary sources:")
@@ -589,8 +604,7 @@ if entry_dict["type"] in ["primary", "processed"]:
                     label="How was the transcription obtained?", options=["Unknown", "Manually", "Automatically"]
                 )
         if entry_dict["media"]["category"] == "audiovisual" or (
-            entry_dict["media"]["category"] == "text"
-            and "audiovisual" in entry_dict["media"]["text_is_transcribed"]
+            entry_dict["media"]["category"] == "text" and "audiovisual" in entry_dict["media"]["text_is_transcribed"]
         ):
             entry_dict["media"]["audiovisual_format"] = st.selectbox(
                 label="What is the format of the audiovisual data?",
@@ -601,8 +615,7 @@ if entry_dict["type"] in ["primary", "processed"]:
                     label="You entered `other` for the audiovisual format, what format is it?",
                 )
         if entry_dict["media"]["category"] == "image" or (
-            entry_dict["media"]["category"] == "text"
-            and "image" in entry_dict["media"]["text_is_transcribed"]
+            entry_dict["media"]["category"] == "text" and "image" in entry_dict["media"]["text_is_transcribed"]
         ):
             entry_dict["media"]["image_format"] = st.selectbox(
                 label="What is the format of the image data?",
@@ -617,12 +630,10 @@ if entry_dict["type"] in ["primary", "processed"]:
         "Media amounts" if add_mode else "",
         expanded=add_mode,
     ):
-        st.write(
-            "We need to at least provide an estimate of the amount of data in the dataset or primary source:"
-        )
+        st.write("We need to at least provide an estimate of the amount of data in the dataset or primary source:")
         entry_dict["media"]["instance_type"] = st.selectbox(
             label="What does a single instance of language data consist of in this dataset/primary source?",
-            options=["", "article", "post", "dialogue", "episode", "book", "other"]
+            options=["", "article", "post", "dialogue", "episode", "book", "other"],
         )
         if entry_dict["media"]["instance_type"] == "other":
             entry_dict["media"]["instance_type"] = st.text_input(
@@ -630,11 +641,11 @@ if entry_dict["type"] in ["primary", "processed"]:
             )
         entry_dict["media"]["instance_count"] = st.selectbox(
             label="Please estimate the number of instances in the dataset",
-            options=["", "n<100", "100<n<1K", "1K<n<10K", "10K<n<100K", "100K<n<1M", "1M<n<1B", "n>1B"]
+            options=["", "n<100", "100<n<1K", "1K<n<10K", "10K<n<100K", "100K<n<1M", "1M<n<1B", "n>1B"],
         )
         entry_dict["media"]["instance_size"] = st.selectbox(
             label="How long do you expect each instance to be on average interms of number of words?",
-            options=["", "n<10", "10<n<100", "100<n<10,000", "n>10,000"]
+            options=["", "n<10", "10<n<100", "100<n<10,000", "n>10,000"],
         )
 
 if entry_dict["type"] == "organization":
@@ -649,10 +660,7 @@ if entry_dict["type"] == "organization":
 # visualize and download
 display_col.markdown("### Review and Save Entry" if add_mode else "")
 if add_mode:
-    with display_col.expander(
-        "Show current entry" if add_mode else "",
-        expanded=add_mode
-    ):
+    with display_col.expander("Show current entry" if add_mode else "", expanded=add_mode):
         st.download_button(
             label="Download output as `json`",
             data=json.dumps(entry_dict, indent=2),
@@ -661,10 +669,7 @@ if add_mode:
         st.markdown(f"You are entering a new resource of type: *{entry_dict['type']}*")
         st.write(entry_dict)
 
-with viz_col.expander(
-    "Select resources to visualize" if viz_mode else "",
-    expanded=viz_mode
-):
+with viz_col.expander("Select resources to visualize" if viz_mode else "", expanded=viz_mode):
     st.write("TODO: add selection widgets")
 
 if viz_mode:
@@ -693,10 +698,7 @@ if viz_mode:
     with viz_col:
         folium_static(world_map, width=1200, height=600)
 
-with viz_col.expander(
-    "ElasticSearch of resource names and descriptions" if viz_mode else "",
-    expanded=viz_mode
-):
+with viz_col.expander("ElasticSearch of resource names and descriptions" if viz_mode else "", expanded=viz_mode):
     st.write("TODO: implement ElasticSearch index and enable search here")
 
 
@@ -704,7 +706,9 @@ with val_col.expander(
     "Select catalogue entry to validate" if val_mode else "",
     expanded=val_mode,
 ):
-    st.write("TODO: either propose an entry that still needs to be validate, or let the user navigate and find one themselves")
+    st.write(
+        "TODO: either propose an entry that still needs to be validate, or let the user navigate and find one themselves"
+    )
 
 if val_mode:
     val_col.markdown("### Entry Category, Name, ID, Homepage, Description")
