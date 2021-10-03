@@ -13,6 +13,38 @@ from streamlit_folium import folium_static
 ## resources
 ##################
 
+### Types of catalogue entries
+entry_types = {
+    "primary": "Primary source",
+    "processed": "Processed language dataset",
+    "organization": "Language organization or advocate",
+}
+
+entry_type_help = """
+- **Primary source**: a single source of language data (text or speech), such as a newspaper, radio, website, book collection, etc.
+You will be asked to fill in information about the availability of the source, its properties including availability and presence of personal information,
+its owners or producers, and the format of the language data.
+- **Processed language dataset**: a processed NLP dataset containing language data that can be used for language modeling (most items should be at least a few sentences long).
+You will be asked to fill in information about the dataset object itself as well as the primary sources it was derived from
+(e.g. Wikipedia, or news sites for most summarization datasets).
+- **Language organization or advocate**: an organization or person holding or working on language resources of various types, formats, and languages.
+Examples of such organization include e.g. the Internet Archive, Masakhane, the French Institut National de l'Audiovisuel, the Wikimedia Foundation, or other libraries, archival institutions, cultural organizations.
+"""
+
+entry_organization_text = """
+#### Information about the language organization or advocate
+
+In order to collaborate with the language organization or advocate to build up resources, we need contact and location information.
+Please use this section to provide such information.
+"""
+
+entry_custodian_text = """
+#### Information about the data owner or custodian
+
+In order to make use of the language data indexed in this entry, we need information about the person or organization
+that either owns or manages it (data custodian). Please use this section to provide such information.
+"""
+
 ### Countries and languages
 # from Wikipedia and https://unstats.un.org/unsd/methodology/m49/
 regions, countries, region_tree = json.load(open("resources/country_regions.json", encoding="utf-8"))
@@ -30,6 +62,7 @@ MAX_COUNTRIES = 25
 primary_taxonomy = json.load(open("resources/primary_source_taxonomy.json", encoding="utf-8"))
 MAX_SOURCES = 25
 
+### Data accessibility
 # from Data Tooling docs
 pii_categories = json.load(open("resources/pii_categories.json", encoding="utf-8"))
 MAX_PII = 25
@@ -167,21 +200,7 @@ st.markdown("---\n")
 
 form_col, display_col, viz_col, _, val_col, _ = st.columns(col_sizes)
 
-if add_mode:
-    form_col.markdown("### Entry Category, Name, ID, Homepage, Description")
-
-resource_type_help = """
-You may choose one of the following three resource types:
-- *Primary source*: a single source of language data (text or speech), such as a newspaper, radio, website, book collection, etc.
-You will be asked to fill in information about the availability of the source, its properties including availability and presence of personal information,
-its owners or producers, and the format of the language data.
-- *Processed dataset*: a processed NLP dataset containing language data that can be used for language modeling (most items should be at least a few sentences long).
-You will be asked to fill in information about the dataset object itself as well as the primary sources it was derived from
-(e.g. Wikipedia, or news sites for most summarization datasets).
-- *Partner organization*: an organization holding a set of resources and datasets of various types, formats, languages and/or with various degrees of availability.
-You will be asked to fill in information about the partner organization itself as well as information on how to get in contact with them.
-(e.g. The Internet Archive, The British Library, l'institut national de l'audiovisuel, Wikimedia Foundation, or other libraries, archival institutions, cultural organizations).
-"""
+form_col.markdown("### Entry Category, Name, ID, Homepage, Description" if add_mode else "")
 
 entry_dict = {
     "uid": "",  # Unique Identifier string to link information and refer to the entry
@@ -210,21 +229,17 @@ entry_dict = {
     },
 }
 
-entry_types = {
-    "primary": "Primary source",
-    "processed": "Processed language dataset",
-    "organization": "Language advocate or organization",
-}
 with form_col.expander(
     "General information" if add_mode else "",
     expanded=add_mode,
 ):
-    st.markdown("##### Entry name and summary")  # TODO add collapsible instructions
+    st.markdown("##### Entry type, name, and summary")  # TODO add collapsible instructions
+    st.markdown(entry_type_help if add_mode else "")
     entry_dict["type"] = st.radio(
         label="What resource type are you submitting?",
         options=entry_types,
         format_func=lambda x: entry_types[x],
-        help=resource_type_help,
+        help=entry_type_help,
     )
     entry_dict["description"]["name"] = st.text_input(
         label=f"Provide a descriptive name for the resource",
@@ -252,7 +267,7 @@ with form_col.expander(
     language_help_text = """
     ##### Whose language is represented in the entry?
     For each entry, we need to catalogue which languages are represented or focused on,
-    as charcterized by the language names and the location of the language data creators.
+    as characterized by both the **language names** and the **geographical distribution of the language data creators**.
     """
     st.markdown(language_help_text)
     entry_dict["languages"]["language_names"] = st.multiselect(
@@ -280,15 +295,15 @@ with form_col.expander(
     )
     st.markdown(
         "In addition to the names of the languages covered by the entry, we need to know where the language creators are **primarily** located.\n"
-        + "This information can be entered both at the level of a *cacroscopic world region* or at the level of the *country or nation*, please select all that apply."
+        + "You may select full *macroscopic areas* (e.g. continents) and/or *specific countries/regions*, choose all that apply."
     )
     entry_dict["languages"]["language_locations_region"] = st.multiselect(
-        label="Macroscopic regions. Please select all that apply from the following",
+        label="Continents, world areas, and country groups. Select all that apply from the following",
         options=["World-Wide"] + list(region_tree.keys()),
-        format_func=lambda x: f"{x}: {', '.join(region_tree.get(x, []))}",
+        format_func=lambda x: f"{x}: {', '.join(region_tree.get(x, [x]))}",
     )
     entry_dict["languages"]["language_locations_nation"] += st.multiselect(
-        label="Countries and nations. Please all that apply from the following",
+        label="Countries, nations, and regions. Select all that apply from the following",
         options=countries + ["other"],
     )
 
@@ -299,7 +314,7 @@ with form_col.expander(
     else "",
     expanded=add_mode,
 ):
-    st.markdown("#### Information about the entry's custodian or representative")
+    st.markdown((entry_organization_text if entry_dict["type"] == "organization" else entry_custodian_text) if add_mode else "")
     if entry_dict["type"] == "organization":
         entry_dict["custodian"]["name"] = entry_dict["description"]["name"]
     else:
@@ -337,11 +352,11 @@ with form_col.expander(
         label="If available, please enter an email address that can be used to ask them about using/obtaining the data:"
     )
     entry_dict["custodian"]["contact_submitter"] = st.checkbox(
-        label="Would you be willing to reach out to the entity to ask them about using their data (with support from the BigScience data sourcing team)?"
+        label="Would you be willing to reach out to the entity to ask them about collaborating or using their data (with support from the BigScience data sourcing team)?"
         + " If so, make sure to fill out your email in the sidebar.",
     )
     entry_dict["custodian"]["additional"] = st.text_input(
-        label="Where can we find more information about the data owner/custodian? Please provide a URL",
+        label="Where can we find more information about the organization or data custodian? Please provide a URL",
         help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists.",
     )
 
@@ -410,14 +425,16 @@ if entry_dict["type"] in ["primary", "processed"]:
                 help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
             )
             st.markdown(
-                "If the language data is shared under established licenses (such as e.g. **MIT license** or **CC-BY-3.0**), please select all that apply below (use the `Add license n` checkbox below if more than one):"
+                "If the language data is shared under established licenses (such as e.g. **MIT license** or **CC-BY-3.0**), please select all that apply:"
             )
             entry_dict["availability"]["licensing"]["license_list"] = st.multiselect(
                 label=f"Under which licenses is the data shared?",
                 options=licenses,
             )
         else:
-            st.write("TODO: what do we do for nonexistent or unclear licenses?")
+            entry_dict["availability"]["licensing"]["license_text"] = st.text_area(
+                label="Please provide your best assessment of whether the data can be used to train models while respecting the rights and wishes of the data creators and custodians. This field will serve as a starting point for further investigation.",
+            )
 
     with form_col.expander(
         "Personal Identifying Information" if add_mode else "",
@@ -562,11 +579,11 @@ if entry_dict["type"] == "processed":
 if entry_dict["type"] in ["primary", "processed"]:
     form_col.markdown("### Media type, format, size, and processing needs" if add_mode else "")
     entry_dict["media"] = {
-        "category": "",
-        "text_format": "",
+        "category": [],
+        "text_format": [],
+        "audiovisual_format": [],
+        "image_format": [],
         "text_is_transcribed": "",
-        "text_transcribed_available": "",
-        "text_transcribed_mode": "",
         "instance_type": "",
         "instance_count": "",
         "instance_size": "",
@@ -576,19 +593,19 @@ if entry_dict["type"] in ["primary", "processed"]:
         "Media type" if add_mode else "",
         expanded=add_mode,
     ):
-        st.write("Please provide information about the format of the language data")
-        entry_dict["media"]["category"] = st.selectbox(
-            label="The language data in the resource is primarily:",
-            options=["", "text", "audiovisual", "image"],
+        st.write("Please provide information about the language data formats covered in the entry")
+        entry_dict["media"]["category"] = st.multiselect(
+            label="The language data in the resource is made up of:",
+            options=["text", "audiovisual", "image"],
             help="Media data provided with transcription should go into **text**, then select the *transcribed* option. PDFs that have pre-extracted text information should go into **text**, PDFs that need OCR should go into **images**, select the latter if you're unsure",
         )
-        if entry_dict["media"]["category"] == "text":
-            entry_dict["media"]["text_format"] = st.selectbox(
-                label="What is the format of the text?",
-                options=["", "plain text", "HTML", "PDF", "XML", "mediawiki", "other"],
+        if "text" in entry_dict["media"]["category"]:
+            entry_dict["media"]["text_format"] = st.multiselect(
+                label="What text formats are present in the entry?",
+                options=["plain text", "HTML", "PDF", "XML", "mediawiki", "other"],
             )
-            if entry_dict["media"]["text_format"] == "other":
-                entry_dict["media"]["text_format"] = st.text_input(
+            if "other" in entry_dict["media"]["text_format"]:
+                entry_dict["media"]["text_format"] += st.text_input(
                     label="You entered `other` for the text format, what format is it?",
                 )
             entry_dict["media"]["text_is_transcribed"] = st.radio(
@@ -596,33 +613,22 @@ if entry_dict["type"] in ["primary", "processed"]:
                 options=["Yes - audiovisual", "Yes - image", "No"],
                 index=2,
             )
-            if entry_dict["media"]["text_is_transcribed"] != "No":
-                entry_dict["media"]["text_transcribed_available"] = st.radio(
-                    label="Are the source media available at the same location?", options=["Unavailable", "Available"]
-                )
-                entry_dict["media"]["text_transcribed_mode"] = st.radio(
-                    label="How was the transcription obtained?", options=["Unknown", "Manually", "Automatically"]
-                )
-        if entry_dict["media"]["category"] == "audiovisual" or (
-            entry_dict["media"]["category"] == "text" and "audiovisual" in entry_dict["media"]["text_is_transcribed"]
-        ):
-            entry_dict["media"]["audiovisual_format"] = st.selectbox(
-                label="What is the format of the audiovisual data?",
-                options=["", "mp4", "wav", "video", "other"],
+        if "audiovisual" in entry_dict["media"]["category"] or "audiovisual" in entry_dict["media"]["text_is_transcribed"]:
+            entry_dict["media"]["audiovisual_format"] = st.multiselect(
+                label="What format or formats do the audiovisual data come in?",
+                options=["mp4", "wav", "video", "other"],
             )
-            if entry_dict["media"]["audiovisual_format"] == "other":
-                entry_dict["media"]["audiovisual_format"] = st.text_input(
+            if "other" in entry_dict["media"]["audiovisual_format"]:
+                entry_dict["media"]["audiovisual_format"] += st.text_input(
                     label="You entered `other` for the audiovisual format, what format is it?",
                 )
-        if entry_dict["media"]["category"] == "image" or (
-            entry_dict["media"]["category"] == "text" and "image" in entry_dict["media"]["text_is_transcribed"]
-        ):
-            entry_dict["media"]["image_format"] = st.selectbox(
-                label="What is the format of the image data?",
-                options=["", "JPEG", "PNG", "PDF", "TIFF", "other"],
+        if "image" in entry_dict["media"]["category"] or "image" in entry_dict["media"]["text_is_transcribed"]:
+            entry_dict["media"]["image_format"] = st.multiselect(
+                label="What format or formats do the image data come in?",
+                options=["JPEG", "PNG", "PDF", "TIFF", "other"],
             )
-            if entry_dict["media"]["image_format"] == "other":
-                entry_dict["media"]["image_format"] = st.text_input(
+            if "other" in entry_dict["media"]["image_format"]:
+                entry_dict["media"]["image_format"] += st.text_input(
                     label="You entered `other` for the image format, what format is it?",
                 )
 
@@ -630,7 +636,7 @@ if entry_dict["type"] in ["primary", "processed"]:
         "Media amounts" if add_mode else "",
         expanded=add_mode,
     ):
-        st.write("We need to at least provide an estimate of the amount of data in the dataset or primary source:")
+        st.write("In order to estimate the amount of data in the dataset or primary source, we need a approximate count of the number of instances and the typical instance size therein.")
         entry_dict["media"]["instance_type"] = st.selectbox(
             label="What does a single instance of language data consist of in this dataset/primary source?",
             options=["", "article", "post", "dialogue", "episode", "book", "other"],
@@ -647,15 +653,6 @@ if entry_dict["type"] in ["primary", "processed"]:
             label="How long do you expect each instance to be on average interms of number of words?",
             options=["", "n<10", "10<n<100", "100<n<10,000", "n>10,000"],
         )
-
-if entry_dict["type"] == "organization":
-    if add_mode:
-        form_col.markdown("### Partner Information")
-    with form_col.expander(
-        "Addiional organization information" if add_mode else "",
-        expanded=add_mode,
-    ):
-        st.write("TODO: what else do we need to know about an organization")
 
 # visualize and download
 display_col.markdown("### Review and Save Entry" if add_mode else "")
@@ -700,7 +697,6 @@ if viz_mode:
 
 with viz_col.expander("ElasticSearch of resource names and descriptions" if viz_mode else "", expanded=viz_mode):
     st.write("TODO: implement ElasticSearch index and enable search here")
-
 
 with val_col.expander(
     "Select catalogue entry to validate" if val_mode else "",
