@@ -25,7 +25,7 @@ entry_type_help = """
 You will be asked to fill in information about the availability of the source, its properties including availability and presence of personal information,
 its owners or producers, and the format of the language data.
 - **Processed language dataset**: a processed NLP dataset containing language data that can be used for language modeling (most items should be at least a few sentences long).
-You will be asked to fill in information about the dataset object itself as well as the primary sources it was derived from
+You will be asked to fill in information about the dataset itself as well as the primary sources it was derived from
 (e.g. Wikipedia, or news sites for most summarization datasets).
 - **Language organization or advocate**: an organization or person holding or working on language resources of various types, formats, and languages.
 Examples of such organization include e.g. the Internet Archive, Masakhane, the French Institut National de l'Audiovisuel, the Wikimedia Foundation, or other libraries, archival institutions, cultural organizations.
@@ -213,6 +213,7 @@ entry_dict = {
     },
     "languages": {
         "language_names": [],
+        "language_comments": "",
         "language_locations_region": [],
         "language_locations_nation": [],
         "validated": False,
@@ -288,13 +289,24 @@ with form_col.expander(
             options=language_lists["niger_congo_languages"],
             help="If the language you are looking for is not in the present list, you can add it through the **other languages** form below",
         )
-    entry_dict["languages"]["language_names"] = st.multiselect(
-        label="For entries that cover languages outside of the current BigScience list, select all that apply here:",
-        options=[", ".join(x["description"]) for x in bcp_47_langs],
-        help="This is a comprehensive list of languages obtained from the BCP-47 standard list, please select one using the search function",
+    if "Arabic" in entry_dict["languages"]["language_names"]:
+        entry_dict["languages"]["language_names"] += st.multiselect(
+            label="The entry covers Arabic language data. Please provide any known information about the dialects here:",
+            options=language_lists["arabic"],
+            format_func=lambda x: f"{x} | {language_lists['arabic'][x]}",
+            help="If the dialect you are looking for is not in the present list, you can add it through the **other languages** form below",
+        )
+    entry_dict["languages"]["language_comments"] = st.text_input(
+        label="Please add any additional comments about the language varieties here (e.g., significant presence of AAVE or code-switching)"
     )
+    if st.checkbox("Show other languages"):
+        entry_dict["languages"]["language_names"] = st.multiselect(
+            label="For entries that cover languages outside of the current BigScience list, select all that apply here:",
+            options=[", ".join(x["description"]) for x in bcp_47_langs],
+            help="This is a comprehensive list of languages obtained from the BCP-47 standard list, please select one using the search function",
+        )
     st.markdown(
-        "In addition to the names of the languages covered by the entry, we need to know where the language creators are **primarily** located.\n"
+        "---\n In addition to the names of the languages covered by the entry, we need to know where the language creators are **primarily** located.\n"
         + "You may select full *macroscopic areas* (e.g. continents) and/or *specific countries/regions*, choose all that apply."
     )
     entry_dict["languages"]["language_locations_region"] = st.multiselect(
@@ -371,6 +383,7 @@ if entry_dict["type"] in ["primary", "processed"]:
         "licensing": {
             "has_licenses": "",
             "license_text": "",
+            "license_properties": [],
             "license_list": [],
         },
         "pii": {
@@ -420,9 +433,17 @@ if entry_dict["type"] in ["primary", "processed"]:
             options=["Yes", "No", "Unclear"],
         )
         if entry_dict["availability"]["licensing"]["has_licenses"] == "Yes":
-            entry_dict["availability"]["licensing"]["license_text"] = st.text_area(
-                label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
-                help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
+            entry_dict["availability"]["licensing"]["license_properties"] = st.multiselect(
+                label="Which of the following best characterize the licensing status of the data? Select all that apply:",
+                options=[
+                    "public domain",
+                    "multiple licenses",
+                    "copyright - all rights reserved",
+                    "open license",
+                    "research use",
+                    "non-commercial use",
+                    "do not distribute",
+                ],
             )
             st.markdown(
                 "If the language data is shared under established licenses (such as e.g. **MIT license** or **CC-BY-3.0**), please select all that apply:"
@@ -430,6 +451,10 @@ if entry_dict["type"] in ["primary", "processed"]:
             entry_dict["availability"]["licensing"]["license_list"] = st.multiselect(
                 label=f"Under which licenses is the data shared?",
                 options=licenses,
+            )
+            entry_dict["availability"]["licensing"]["license_text"] = st.text_area(
+                label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
+                help="The text may be included in a link to the license webpage. You do not neet to copy the text if it corresponds to one of the established licenses that may be selected below.",
             )
         else:
             entry_dict["availability"]["licensing"]["license_text"] = st.text_area(

@@ -51,5 +51,35 @@
     "Telugu",
     "Tamil",
     "Urdu"
-  ]
+  ],
+  "arabic": {
+    "ar-CLS": "(Arabic (Classic))",
+    "ar-MSA": "(Arabic (Modern Standard Arabic))",
+    "ar-LEV": "(Arabic (Levant))",
+    "ar-NOR": "(Arabic (North Africa))",
+    "ar-GLF": "(Arabic (Gulf))",
+    "ar-AE": "(Arabic (United Arab Emirates))",
+    "ar-BH": "(Arabic (Bahrain))",
+    "ar-DJ": "(Arabic (Djibouti))",
+    "ar-DZ": "(Arabic (Algeria))",
+    "ar-EG": "(Arabic (Egypt))",
+    "ar-IQ": "(Arabic (Iraq))",
+    "ar-JO": "(Arabic (Jordan))",
+    "ar-KM": "(Arabic (Comoros))",
+    "ar-KW": "(Arabic (Kuwait))",
+    "ar-LB": "(Arabic (Lebanon))",
+    "ar-LY": "(Arabic (Libya))",
+    "ar-MA": "(Arabic (Morocco))",
+    "ar-MR": "(Arabic (Mauritania))",
+    "ar-OM": "(Arabic (Oman))",
+    "ar-PS": "(Arabic (Palestinian Territories))",
+    "ar-QA": "(Arabic (Qatar))",
+    "ar-SA": "(Arabic (Saudi Arabia))",
+    "ar-SD": "(Arabic (Sudan))",
+    "ar-SO": "(Arabic (Somalia))",
+    "ar-SS": "(Arabic (South Sudan))",
+    "ar-SY": "(Arabic (Syria))",
+    "ar-TN": "(Arabic (Tunisia))",
+    "ar-YE": "(Arabic (Yemen))"
+  }
 }
