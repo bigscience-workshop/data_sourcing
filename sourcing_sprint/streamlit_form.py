@@ -136,20 +136,64 @@ class MarkerWithProps(Marker):
         self.props = json.loads(json.dumps(props))
 
 @st.cache(allow_output_mutation=True)
+def get_region_center(region_name):
+    latitudes = []
+    longitudes = []
+    for name in region_tree[region_name]:
+        if name in region_tree:
+            region_latitudes, region_longitudes = get_region_center(name)
+            latitudes += region_latitudes
+            longitudes += region_longitudes
+        elif name in country_centers or name in country_mappings["to_center"]:
+            country_center = country_centers[country_mappings["to_center"].get(name, name)]
+            latitudes += [float(country_center["latitude"])]
+            longitudes += [float(country_center["longitude"])]
+    return latitudes, longitudes
+
+@st.cache(allow_output_mutation=True)
+def get_region_countries(region_name):
+    countries = []
+    for name in region_tree[region_name]:
+        if name in region_tree:
+            countries += get_region_countries(name)
+        else:
+            countries += [name]
+    return countries
+
+@st.cache(allow_output_mutation=True)
 def make_choro_map(resource_counts, marker_thres=0):
     world_map = folium.Map(tiles="cartodbpositron", location=[0, 0], zoom_start=1.5)
     marker_cluster = MarkerCluster(icon_create_function=ICON_CREATE_FUNCTIOM)
     marker_cluster.add_to(world_map)
     for name, count in resource_counts.items():
-        if count > marker_thres and name in country_centers or name in country_mappings["to_center"]:
+        if name in country_centers or name in country_mappings["to_center"]:
             country_center = country_centers[country_mappings["to_center"].get(name, name)]
             MarkerWithProps(
                 location=[country_center["latitude"], country_center["longitude"]],
                 popup=f"Country : {name}<br> \n Resources : {count} <br>",
                 props={"name": name, "resources": count},
             ).add_to(marker_cluster)
+        # put a pin at the center of the region
+        elif name in region_tree:
+            latitudes, longitudes = get_region_center(name)
+            if len(latitudes) > 0:
+                lat = sum(latitudes) / len(latitudes)
+                lon = sum(longitudes) / len(longitudes)
+                MarkerWithProps(
+                    location=[lat, lon],
+                    popup=f"Country : {name}<br> \n Resources : {count} <br>",
+                    props={"name": name, "resources": count},
+                ).add_to(marker_cluster)
+    # for choropleth, add counts to all countries in a region
+    choropleth_counts = {}
+    for loc_name in list(resource_counts.keys()):
+        if loc_name in region_tree:
+            for country_name in get_region_countries(loc_name):
+                choropleth_counts[country_name] = choropleth_counts.get(country_name, 0) + resource_counts[loc_name]
+        else:
+            choropleth_counts[loc_name] = choropleth_counts.get(loc_name, 0) + resource_counts[loc_name]
     df_resource_counts = pd.DataFrame(
-        [(country_mappings["to_outline"].get(n, n), c) for n, c in resource_counts.items()],
+        [(country_mappings["to_outline"].get(n, n), c) for n, c in choropleth_counts.items()],
         columns=["Name", "Resources"],
     )
     folium.Choropleth(
@@ -167,7 +211,7 @@ def make_choro_map(resource_counts, marker_thres=0):
 ## App utility functions
 ##################
 def load_catalogue():
-    catalogue_list = [json.load(open(fname, encoding="utf-8")) for fname in glob("entries/*.json")]
+    catalogue_list = [json.load(open(fname, encoding="utf-8")) for fname in glob("entries/*.json") if not "-validated-" in fname]
     catalogue = dict([(dct["uid"], dct) for dct in catalogue_list])
     catalogue[''] = {
         "uid": "",
@@ -823,41 +867,41 @@ with viz_col.expander("Select resources to visualize" if viz_mode else "", expan
             options=custodian_types,
         )
         full_catalogue = load_catalogue()
-        # st.write(full_catalogue)
-        filtered_catalogue = [entry for uid, entry in full_catalogue.items() if filter_entry(entry, filter_dict) and uid != ""]
+        filtered_catalogue = [entry for uid, entry in full_catalogue.items() if filter_entry(entry, filter_dict) and not (uid == "")]
         st.write(f"Your query matched {len(filtered_catalogue)} entries in the current catalogue.")
+        entry_location_type = st.radio(
+            label="I want to visualize",
+            options=[
+                "Where the organizations or data custodians are located",
+                "Where the language data creators are located",
+            ],
+        )
+        show_by_org = entry_location_type == "Where the organizations or data custodians are located"
     else:
         filtered_catalogue = []
 
 with viz_col.expander("Map of entries" if viz_mode else "", expanded=viz_mode):
     if viz_mode:
-        # make random count data
-        random_counts = {
-            "France": 45,
-            "United States": 128,
-            "Chile": 10,
-            "Belgium": 4,
-            "Puerto Rico": 3,
-            "Canada": 25,
-            "Greece": 5,
-            "South Africa": 34,
-            "Algeria": 5,
-            "Lybia": 7,
-            "Kenya": 23,
-            "Rwanda": 4,
-            "Vietnam": 10,
-            "Hong Kong": 12,
-            "China": 28,
-            "New Zealand": 12,
-            "Australia": 4,
-            "Iceland": 30,
-        }
-        world_map = make_choro_map(random_counts)
+        filtered_counts = {}
+        for entry in filtered_catalogue:
+            locations = [entry["custodian"]["location"]] if show_by_org else entry["languages"]["language_locations"]
+            # be as specific as possible
+            locations = [loc for loc in locations if not any([l in region_tree.get(loc, []) for l in locations])]
+            for loc in locations:
+                filtered_counts[loc] = filtered_counts.get(loc, 0) + 1
+        world_map = make_choro_map(filtered_counts)
         folium_static(world_map, width=1150, height=600)
 
 viz_col.markdown("### Search entry names and descriptions" if viz_mode else "")
 with viz_col.expander("ElasticSearch of resource names and descriptions" if viz_mode else "", expanded=viz_mode):
     st.write("TODO: implement ElasticSearch index and enable search here")
+    st.write("Meanwhile, the full list of entries corresponding to the selection above can be found here:")
+    view_entry = st.selectbox(
+        label="Select an entry to see more detail:",
+        options=filtered_catalogue,
+        format_func=lambda entry: f"{entry['uid']} | {entry['description']['name']} -- {entry['description']['description']}"
+    )
+    st.markdown(f"##### *UID:* {view_entry['uid']} - *Name:* {view_entry['description']['name']}\n\n{view_entry['description']['description']}")
 
 ##################
 ## SECTION: Validate an existing entry
