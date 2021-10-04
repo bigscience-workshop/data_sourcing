@@ -181,11 +181,11 @@ def load_catalogue():
 
 # check whether the entry can be written to the catalogue
 def can_save(entry_dct, submission_dct, adding_mode):
-    if entry_dct['uid'] == "" or isfile(pjoin("entries", f"{entry_dct['uid']}.json")):
+    if add_mode and (entry_dct['uid'] == "" or isfile(pjoin("entries", f"{entry_dct['uid']}.json"))):
         return False, f"There is already an entry with `uid` {entry_dct['uid']}, you need to give your entry a different one before saving. You can look at the entry with this `uid` by switching to the **Validate an existing entry** mode of this app in the left sidebar."
     if adding_mode and submission_dct["submitted_by"] == "":
         return False, f"Please enter a name (or pseudonym) in the left sidebar before submitting this entry."
-    if not adding_mode and submission_dct["validated"] == "":
+    if not adding_mode and submission_dct["validated_by"] == "":
         return False, f"Please enter a name (or pseudonym) in the left sidebar before validating this entry."
     if adding_mode and entry_dict["custodian"]["contact_submitter"] and submission_dct["submitted_email"] == "":
         return False, f"You said that you would be willing to reach out to the entity or organization. To do so, please enter an email we can use to follow up in the left sidebar."
@@ -764,8 +764,8 @@ if add_mode:
             if good_to_save:
                 submission_info_dict["entry_uid"] = entry_dict['uid']
                 submission_info_dict["submitted_date"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-                json.dump(entry_dict, open(pjoin("entries", f"{entry_dict['uid']}.json"), "w", encoding="utf-8"))
-                json.dump(submission_info_dict, open(pjoin("entry_submitted_by", f"{entry_dict['uid']}.json"), "w", encoding="utf-8"))
+                json.dump(entry_dict, open(pjoin("entries", f"{entry_dict['uid']}.json"), "w", encoding="utf-8"), indent=2)
+                json.dump(submission_info_dict, open(pjoin("entry_submitted_by", f"{entry_dict['uid']}.json"), "w", encoding="utf-8"), indent=2)
             else:
                 st.markdown("##### Unable to save\n" + save_message)
         st.markdown(f"You are entering a new resource of type: *{entry_dict['type']}*")
@@ -825,11 +825,14 @@ with val_col.expander(
     catalogue = load_catalogue()
     entry_id = st.selectbox(
         label="Select an entry to validate from the existing catalogue",
-        options=catalogue,
-        format_func=lambda x: catalogue[x]['description']['name'],
+        options=[k for k in catalogue if "-validated-" not in k],
+        format_func=lambda x: f"{x} | {catalogue[x]['description']['name']}",
         index=len(catalogue)-1,
     )
     entry_dict = catalogue[entry_id]
+    already_validated_list = glob(pjoin("entries", f"{entry_id}-validated*.json"))
+    if len(already_validated_list) > 0:
+        st.write("Note: this dataset has already been validated")
     st.markdown(f"##### Validating: {entry_types.get(entry_dict['type'], '')} - {entry_dict['description']['name']}\n\n{entry_dict['description']['description']}")
 
 if val_mode and "languages" in entry_dict:
@@ -865,7 +868,7 @@ if val_mode and "languages" in entry_dict:
             default=entry_dict["languages"]["language_locations"],
         )
         st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **languages** section of the entry")
-        if st.button("Validate: languages"):
+        if st.checkbox("Validate: languages"):
             entry_dict["languages"]["language_names"] = new_lang_list
             entry_dict["languages"]["language_comments"] = new_lang_comment
             entry_dict["languages"]["language_locations"] = new_region_list
@@ -914,7 +917,7 @@ if val_mode and "custodian" in entry_dict:
             value=entry_dict["custodian"]["additional"]
         )
         st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **custodian** section of the entry")
-        if st.button("Validate: custodian"):
+        if st.checkbox("Validate: custodian"):
             entry_dict["custodian"]["name"] = new_custodian_name
             entry_dict["custodian"]["type"] = new_custodian_type
             entry_dict["custodian"]["location"] = new_custodian_location
@@ -928,9 +931,23 @@ if val_mode and "custodian" in entry_dict:
 val_display_col.markdown("### Review and Save Entry" if val_mode else "")
 if val_mode:
     with val_display_col.expander("Show current entry" if val_mode else "", expanded=val_mode):
+        st.markdown("Do not forget to **save your work** to the BigScience Data Catalogue!\n\nOnce you are done, please press the button below - this will either record the entry or tell you if there's anything you need to change first.")
+        if st.button("Save validated entry to catalogue"):
+            good_to_save, save_message = can_save(entry_dict, submission_info_dict, add_mode)
+            if good_to_save:
+                validation_info_dict = json.load(open(pjoin("entry_submitted_by", f"{entry_dict['uid']}.json"), encoding="utf-8"))
+                validation_info_dict["validated_by"] = submission_info_dict['validated_by']
+                validation_info_dict["validated_date"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+                friendly_date = re.sub(r"[^\w\s]", "_", validation_info_dict["validated_date"]).replace(" ", "_")
+                json.dump(entry_dict, open(pjoin("entries", f"{entry_dict['uid']}-validated-{friendly_date}.json"), "w", encoding="utf-8"), indent=2)
+                json.dump(validation_info_dict, open(pjoin("entry_submitted_by", f"{entry_dict['uid']}-validated-{friendly_date}.json"), "w", encoding="utf-8"), indent=2)
+            else:
+                st.markdown("##### Unable to save\n" + save_message)
+        st.markdown(f"You are entering a new resource of type: *{entry_dict['type']}*")
+        st.write(entry_dict)
+        st.markdown("You can also download the entry as a `json` file with the following button:")
         st.download_button(
-            label="Download output as `json`",
+            label="Download entry dictionary",
             data=json.dumps(entry_dict, indent=2),
             file_name="default_entry_name.json" if entry_dict["uid"] == "" else f"{entry_dict['uid']}.json",
         )
-        st.write(entry_dict)
