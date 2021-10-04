@@ -280,11 +280,15 @@ For *Creative Commons*, the macroscopic area would be `World-Wide`.
 
 #### Representative, Owner, or Custodian
 
-From the dropdown box, please select the type of entity you are providing information about and enter the entity's name. If available, please enter an email address that can be used to ask them about using/obtaining their data.
+From the dropdown box, please select the type of entity you are providing information about. Possible answers include `a private individual`, `a commercial entity`, `a library, museum, or archival institute`, `a university or research institution`, `a nonprofit/NGO`, `a government organization`, and `other`. If you select `other`, please provide a description. 
+
+Select the country, nation, region, or territory where the entity is located or hosted. Please enter the name of a contact person for the entity. The textbox will autopopulate with the name of the entity, but please replace this with the name of an individual if there is a specific person we can direct our query to. If available, please enter an email address that can be used to ask them about using/obtaining their data.
 
 Please select whether you would be willing to contact the entity to ask them about using their data (with support from the BigScience Data Sourcing team). Is yes, please me make sure that your email information is entered in the left sidebar.
 
-If there is a URL where we can find out more information about the data owner/custodian, please add it to the final textbox. For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists.
+If there is a URL where we can find out more information about the data owner/custodian, please add it to the final textbox. For example, please provide the URL of the webpage with their contact information, the homepage of the organization, or even their Wikipedia page if it exists.
+
+For *Creative Commons*, the type is `a nonprofit/NGO`, the location of the entity is `United States of America`, the contact name is the default `Creative Commons`, the contact email is `info@creativecommons.org` and additional information on the entity is available at `https://search.creativecommons.org/`. 
 
 ### Submitting the Form
 
