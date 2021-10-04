@@ -894,14 +894,15 @@ with viz_col.expander("Map of entries" if viz_mode else "", expanded=viz_mode):
 
 viz_col.markdown("### Search entry names and descriptions" if viz_mode else "")
 with viz_col.expander("ElasticSearch of resource names and descriptions" if viz_mode else "", expanded=viz_mode):
-    st.write("TODO: implement ElasticSearch index and enable search here")
-    st.write("Meanwhile, the full list of entries corresponding to the selection above can be found here:")
-    view_entry = st.selectbox(
-        label="Select an entry to see more detail:",
-        options=filtered_catalogue,
-        format_func=lambda entry: f"{entry['uid']} | {entry['description']['name']} -- {entry['description']['description']}"
-    )
-    st.markdown(f"##### *UID:* {view_entry['uid']} - *Name:* {view_entry['description']['name']}\n\n{view_entry['description']['description']}")
+    if viz_mode:
+        st.write("TODO: implement ElasticSearch index and enable search here")
+        st.write("Meanwhile, the full list of entries corresponding to the selection above can be found here:")
+        view_entry = st.selectbox(
+            label="Select an entry to see more detail:",
+            options=filtered_catalogue,
+            format_func=lambda entry: f"{entry['uid']} | {entry['description']['name']} -- {entry['description']['description']}"
+        )
+        st.markdown(f"##### *UID:* {view_entry['uid']} - *Name:* {view_entry['description']['name']}\n\n{view_entry['description']['description']}")
 
 ##################
 ## SECTION: Validate an existing entry
