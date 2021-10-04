@@ -179,6 +179,18 @@ def load_catalogue():
     }
     return catalogue
 
+def filter_entry(entry, filter_dct):
+    res = True
+    for k, v in entry.items():
+        if k in filter_dct:
+            if isinstance(v, dict):
+                res = res and filter_entry(v, filter_dct[k])
+            elif isinstance(v, list):
+                res = res and (len(filter_dct[k]) == 0 or any([e in filter_dct[k] for e in v]))
+            else:
+                res = res and (len(filter_dct[k]) == 0 or v in filter_dct[k])
+    return res
+
 # check whether the entry can be written to the catalogue
 def can_save(entry_dct, submission_dct, adding_mode):
     if add_mode and (entry_dct['uid'] == "" or isfile(pjoin("entries", f"{entry_dct['uid']}.json"))):
@@ -703,9 +715,9 @@ if entry_dict["type"] in ["primary", "processed"]:
                 options=["plain text", "HTML", "PDF", "XML", "mediawiki", "other"],
             )
             if "other" in entry_dict["media"]["text_format"]:
-                entry_dict["media"]["text_format"] += st.text_input(
+                entry_dict["media"]["text_format"] += [st.text_input(
                     label="You entered `other` for the text format, what format is it?",
-                )
+                )]
             entry_dict["media"]["text_is_transcribed"] = st.radio(
                 label="Was the text transcribed from another media format (e.g. audio or image)",
                 options=["Yes - audiovisual", "Yes - image", "No"],
@@ -717,18 +729,18 @@ if entry_dict["type"] in ["primary", "processed"]:
                 options=["mp4", "wav", "video", "other"],
             )
             if "other" in entry_dict["media"]["audiovisual_format"]:
-                entry_dict["media"]["audiovisual_format"] += st.text_input(
+                entry_dict["media"]["audiovisual_format"] += [st.text_input(
                     label="You entered `other` for the audiovisual format, what format is it?",
-                )
+                )]
         if "image" in entry_dict["media"]["category"] or "image" in entry_dict["media"]["text_is_transcribed"]:
             entry_dict["media"]["image_format"] = st.multiselect(
                 label="What format or formats do the image data come in?",
                 options=["JPEG", "PNG", "PDF", "TIFF", "other"],
             )
             if "other" in entry_dict["media"]["image_format"]:
-                entry_dict["media"]["image_format"] += st.text_input(
+                entry_dict["media"]["image_format"] += [st.text_input(
                     label="You entered `other` for the image format, what format is it?",
-                )
+                )]
 
     with form_col.expander(
         "Media amounts" if add_mode else "",
@@ -780,7 +792,42 @@ if add_mode:
 ##################
 viz_col.markdown("### Select entries to visualize" if viz_mode else "")
 with viz_col.expander("Select resources to visualize" if viz_mode else "", expanded=viz_mode):
-    st.write("TODO: add selection widgets")
+    if viz_mode:
+        st.markdown("##### Select entries by category, language, type of custodian or media")
+        st.markdown(
+            "You can select specific parts of the catalogue to visualize in this window." + \
+            " Leave a field empty to select all values, or select specific options to only select entries that have one of the chosen values."
+        )
+        filter_dict = {
+            "type": [],
+            "languages": {
+                "language_names": [],
+            },
+            "custodian": {  # for Primary source or Language daset - data owner or custodian
+                "type": [],
+            },
+        }
+        filter_dict["type"] = st.multiselect(
+            label="I want to only see entries that are of the following category:",
+            options=entry_types,
+            format_func=lambda x: entry_types[x],
+        )
+        filter_dict["languages"]["language_names"] = st.multiselect(
+            label="I want to only see entries that have one of the following languages:",
+            options=list(language_lists["language_groups"].keys()) + \
+                language_lists["niger_congo_languages"] + \
+                language_lists["indic_languages"],
+        )
+        filter_dict["custodian"]["type"] = st.multiselect(
+            label="I want to only see entries that corresponds to organizations or to data that id owned/managed by organizations of the following types:",
+            options=custodian_types,
+        )
+        full_catalogue = load_catalogue()
+        # st.write(full_catalogue)
+        filtered_catalogue = [entry for uid, entry in full_catalogue.items() if filter_entry(entry, filter_dict) and uid != ""]
+        st.write(f"Your query matched {len(filtered_catalogue)} entries in the current catalogue.")
+    else:
+        filtered_catalogue = []
 
 with viz_col.expander("Map of entries" if viz_mode else "", expanded=viz_mode):
     if viz_mode:
