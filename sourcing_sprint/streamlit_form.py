@@ -165,32 +165,43 @@ st.set_page_config(
 )
 
 page_description = """
-# Adding a new resource
+# BigScience Data Catalogue
 
-This form can be used to add a new entry to the BigScience Data Sourcing Catalogue.
+This application serves as the landing page for the **Catalogue of Language Data and Resources**
+that is being built and maintained as part of the [BigScience workshop](https://bigscience.huggingface.co/).
 
-To do so, please add your name, email (optional), the type of resource you would like to add,
-then fill out the form on the right.
+The Catalogue app currently supports the following three functionalities:
+- **Add a new entry**: This form can be used to add a new entry to the BigScience Data Sourcing Catalogue. To do so, enter add your name and email
+then fill out the form according to the [**instructions.**](https://github.com/bigscience-workshop/data_sourcing/blob/master/sourcing_sprint/guide.md#guide-to-submitting-sources-to-the-bigscience-data-sourcing-hackathon)
+- **Explore the current catalogue**: This page lets you explore the current catalogue and the geographical distribution of the entries.
+- **Validate an existing entry**: Use this functionality to verify or add information to an existing entry.
 
-For more information: [**guide to adding a new catalogue entry.**](https://github.com/bigscience-workshop/data_sourcing/blob/master/sourcing_sprint/guide.md#guide-to-submitting-sources-to-the-bigscience-data-sourcing-hackathon)
-
-### Submitter information
+Choose which functionality you want to make use of below.
 """
 st.sidebar.markdown(page_description, unsafe_allow_html=True)
 
-with st.sidebar.form("submitter_information"):
-    submitter_name = st.text_input(label="Name of submitter:")
-    submitter_email = st.text_input(
-        label="Email (optional, enter if you are available to follow up on this catalogue entry):"
-    )
-    submitted_info = st.form_submit_button("Submit self information")
+app_mode = st.sidebar.radio(
+    label="App mode:",
+    options=[
+        "Add a new entry",
+        "Explore the current catalogue",
+        "Validate an existing entry",
+    ],
+)
+add_mode = app_mode == "Add a new entry"
+viz_mode = app_mode == "Explore the current catalogue"
+val_mode = app_mode == "Validate an existing entry"
 
-st.markdown("#### What would you like to use this app for?")
-add_col, viz_col, val_col = st.columns([1, 1, 1])
-add_mode_button = add_col.button("Add a new entry")
-viz_mode = viz_col.button("Explore the current catalogue")
-val_mode = val_col.button("Validate an existing entry")
-add_mode = add_mode_button or not (val_mode or viz_mode)
+if add_mode:
+    with st.sidebar.form("submitter_information"):
+        submitter_name = st.text_input(label="Name of submitter:")
+        submitter_email = st.text_input(
+            label="Email (optional, enter if you are available to follow up on this catalogue entry):"
+        )
+        submitted_info = st.form_submit_button("Submit self information")
+
+st.markdown("#### BigScience Catalogue of Language Data and Resources")
+
 if add_mode:
     col_sizes = [60, 40, 5, 1, 5, 1]
 if viz_mode:
