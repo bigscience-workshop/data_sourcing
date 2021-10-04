@@ -238,18 +238,16 @@ submission_info_dict = {
     "validated_by": "",
     "validated_date": "",
 }
-if add_mode or val_mode:
-    with st.sidebar.form("submitter_information"):
-        user_name = st.text_input(label="Name of submitter:")
-        user_email = st.text_input(
-            label="Email (optional, enter if you are available to follow up on this catalogue entry):"
-        )
-        submitted_info = st.form_submit_button("Submit self information")
-        if add_mode:
-            submission_info_dict["submitted_by"] = user_name
-            submission_info_dict["submitted_email"] = user_email
-        else:
-            submission_info_dict["validated_by"] = user_name
+with st.sidebar.expander("User information", expanded=add_mode or val_mode):
+    user_name = st.text_input(label="Name of submitter:")
+    user_email = st.text_input(
+        label="Email (optional, enter if you are available to follow up on this catalogue entry):"
+    )
+    if add_mode:
+        submission_info_dict["submitted_by"] = user_name
+        submission_info_dict["submitted_email"] = user_email
+    else:
+        submission_info_dict["validated_by"] = user_name
 
 st.markdown("#### BigScience Catalogue of Language Data and Resources\n---\n")
 
