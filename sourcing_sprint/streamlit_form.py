@@ -73,7 +73,7 @@ licenses = json.load(open("resources/licenses.json", encoding="utf-8"))
 MAX_LICENSES = 25
 
 ##################
-## Mapping functions
+## Mapping and visualization functions
 ##################
 WORLD_GEO_URL = (
     "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/world-countries.json"
@@ -94,7 +94,6 @@ ICON_CREATE_FUNCTIOM = """
         });
     }
 """
-
 
 class MarkerWithProps(Marker):
     _template = Template(
@@ -124,7 +123,6 @@ class MarkerWithProps(Marker):
         )
         self.props = json.loads(json.dumps(props))
 
-
 @st.cache(allow_output_mutation=True)
 def make_choro_map(resource_counts, marker_thres=0):
     world_map = folium.Map(tiles="cartodbpositron", location=[0, 0], zoom_start=1.5)
@@ -153,6 +151,21 @@ def make_choro_map(resource_counts, marker_thres=0):
     ).add_to(world_map)
     return world_map
 
+##################
+## App utility functions
+##################
+def load_catalogue():
+    catalogue_list = [json.load(open(fname, encoding="utf-8")) for fname in glob("entries/*.json")]
+    catalogue = dict([(dct["uid"], dct) for dct in catalogue_list])
+    catalogue[''] = {
+        "uid": "",
+        "type": "",
+        "description": {
+            "name": "",
+            "description": "",
+        },
+    }
+    return catalogue
 
 ##################
 ## streamlit
@@ -200,8 +213,9 @@ if add_mode:
         )
         submitted_info = st.form_submit_button("Submit self information")
 
-st.markdown("#### BigScience Catalogue of Language Data and Resources")
+st.markdown("#### BigScience Catalogue of Language Data and Resources\n---\n")
 
+# switch between expanded tabs
 if add_mode:
     col_sizes = [60, 40, 5, 1, 5, 1]
 if viz_mode:
@@ -209,12 +223,11 @@ if viz_mode:
 if val_mode:
     col_sizes = [5, 1, 5, 1, 100, 1]
 
-st.markdown("---\n")
-
 form_col, display_col, viz_col, _, val_col, _ = st.columns(col_sizes)
 
-form_col.markdown("### Entry Category, Name, ID, Homepage, Description" if add_mode else "")
-
+##################
+## SECTION: Add a new entry
+##################
 entry_dict = {
     "uid": "",  # Unique Identifier string to link information and refer to the entry
     "type": "",  # in ["Primary source", "Language dataset", "Language organization"]
@@ -227,8 +240,7 @@ entry_dict = {
     "languages": {
         "language_names": [],
         "language_comments": "",
-        "language_locations_region": [],
-        "language_locations_nation": [],
+        "language_locations": [],
         "validated": False,
     },
     "custodian": {  # for Primary source or Language daset - data owner or custodian
@@ -243,6 +255,7 @@ entry_dict = {
     },
 }
 
+form_col.markdown("### Entry Category, Name, ID, Homepage, Description" if add_mode else "")
 with form_col.expander(
     "General information" if add_mode else "",
     expanded=add_mode,
@@ -299,7 +312,7 @@ with form_col.expander(
     if "Indic" in entry_dict["languages"]["language_names"]:
         entry_dict["languages"]["language_names"] += st.multiselect(
             label="The entry covers Indic languages, select any that apply here:",
-            options=language_lists["niger_congo_languages"],
+            options=language_lists["indic_languages"],
             help="If the language you are looking for is not in the present list, you can add it through the **other languages** form below",
         )
     if "Arabic" in entry_dict["languages"]["language_names"]:
@@ -322,12 +335,12 @@ with form_col.expander(
         "---\n In addition to the names of the languages covered by the entry, we need to know where the language creators are **primarily** located.\n"
         + "You may select full *macroscopic areas* (e.g. continents) and/or *specific countries/regions*, choose all that apply."
     )
-    entry_dict["languages"]["language_locations_region"] = st.multiselect(
+    entry_dict["languages"]["language_locations"] = st.multiselect(
         label="Continents, world areas, and country groups. Select all that apply from the following",
         options=["World-Wide"] + list(region_tree.keys()),
         format_func=lambda x: f"{x}: {', '.join(region_tree.get(x, [x]))}",
     )
-    entry_dict["languages"]["language_locations_nation"] += st.multiselect(
+    entry_dict["languages"]["language_locations"] += st.multiselect(
         label="Countries, nations, and regions. Select all that apply from the following",
         options=countries + ["other"],
     )
@@ -725,52 +738,52 @@ if add_mode:
         st.markdown(f"You are entering a new resource of type: *{entry_dict['type']}*")
         st.write(entry_dict)
 
+##################
+## SECTION: Explore the current catalogue
+##################
+viz_col.markdown("### Select entries to visualize" if viz_mode else "")
 with viz_col.expander("Select resources to visualize" if viz_mode else "", expanded=viz_mode):
     st.write("TODO: add selection widgets")
 
-if viz_mode:
-    # make random count data
-    random_counts = {
-        "France": 45,
-        "United States": 128,
-        "Chile": 10,
-        "Belgium": 4,
-        "Puerto Rico": 3,
-        "Canada": 25,
-        "Greece": 5,
-        "South Africa": 34,
-        "Algeria": 5,
-        "Lybia": 7,
-        "Kenya": 23,
-        "Rwanda": 4,
-        "Vietnam": 10,
-        "Hong Kong": 12,
-        "China": 28,
-        "New Zealand": 12,
-        "Australia": 4,
-        "Iceland": 30,
-    }
-    world_map = make_choro_map(random_counts)
-    with viz_col:
-        folium_static(world_map, width=1200, height=600)
+with viz_col.expander("Map of entries" if viz_mode else "", expanded=viz_mode):
+    if viz_mode:
+        # make random count data
+        random_counts = {
+            "France": 45,
+            "United States": 128,
+            "Chile": 10,
+            "Belgium": 4,
+            "Puerto Rico": 3,
+            "Canada": 25,
+            "Greece": 5,
+            "South Africa": 34,
+            "Algeria": 5,
+            "Lybia": 7,
+            "Kenya": 23,
+            "Rwanda": 4,
+            "Vietnam": 10,
+            "Hong Kong": 12,
+            "China": 28,
+            "New Zealand": 12,
+            "Australia": 4,
+            "Iceland": 30,
+        }
+        world_map = make_choro_map(random_counts)
+        folium_static(world_map, width=1150, height=600)
 
+viz_col.markdown("### Search entry names and descriptions" if viz_mode else "")
 with viz_col.expander("ElasticSearch of resource names and descriptions" if viz_mode else "", expanded=viz_mode):
     st.write("TODO: implement ElasticSearch index and enable search here")
 
+##################
+## SECTION: Validate an existing entry
+##################
+val_col.markdown("### Entry selection" if val_mode else "")
 with val_col.expander(
     "Select catalogue entry to validate" if val_mode else "",
     expanded=val_mode,
 ):
-    catalogue_list = [json.load(open(fname, encoding="utf-8")) for fname in glob("entries/*.json")]
-    catalogue = dict([(dct["uid"], dct) for dct in catalogue_list])
-    catalogue[''] = {
-        "uid": "",
-        "type": "",
-        "description": {
-            "name": "",
-            "description": "",
-        },
-    }
+    catalogue = load_catalogue()
     entry_id = st.selectbox(
         label="Select an entry to validate from the existing catalogue",
         options=catalogue,
@@ -780,26 +793,41 @@ with val_col.expander(
     entry_dict = catalogue[entry_id]
     st.markdown(f"##### Validating: {entry_types.get(entry_dict['type'], '')} - {entry_dict['description']['name']}\n\n{entry_dict['description']['description']}")
 
-if val_mode:
-    val_col.markdown("### Entry Category, Name, ID, Homepage, Description")
-
-with val_col.expander(
-    "Validate general information for the entry" if val_mode else "",
-    expanded=val_mode,
-):
-    st.write("TODO: load general information for selected entry and let user modify/save/validate")
-
-if val_mode:
-    val_col.markdown("### Languages and locations")
-
-with val_col.expander(
-    "Validate language information for the entry" if val_mode else "",
-    expanded=val_mode,
-):
-    st.write("TODO: load language information for selected entry and let user modify/save/validate")
-
-with val_col.expander(
-    "Validate location information for the entry" if val_mode else "",
-    expanded=val_mode,
-):
-    st.write("TODO: load location information for selected entry and let user modify/save/validate")
+if val_mode and "languages" in entry_dict:
+    val_col.markdown("### Entry Languages and Locations" if add_mode else "")
+    with val_col.expander(
+        "Language names and represented regions" if val_mode else "",
+        expanded=val_mode,
+    ):
+        language_choices = sorted(set(
+            list(language_lists["language_groups"].keys()) + \
+            language_lists["niger_congo_languages"] + \
+            language_lists["indic_languages"] + \
+            list(language_lists["arabic"].keys()) + \
+            [", ".join(x["description"]) for x in bcp_47_langs] + \
+            entry_dict["languages"]["language_names"]
+        )) + ["other"]
+        new_lang_list = st.multiselect(
+            label="The entry currently has the following list of languages, you can add or remove any here:",
+            options=language_choices,
+            default=entry_dict["languages"]["language_names"],
+        )
+        new_lang_comment = st.text_input(
+            label="The value currently has the following additional comment on the language(s) covered, you may edit it here",
+            value=entry_dict["languages"]["language_comments"],
+        )
+        region_choices = sorted(set(
+            ["World-Wide"] + list(region_tree.keys()) + \
+            countries + entry_dict["languages"]["language_locations"]
+        )) + ["other"]
+        new_region_list = st.multiselect(
+            label="The entry currently has the following list of locations for the covered languages, you can add or remove any here:",
+            options=region_choices,
+            default=entry_dict["languages"]["language_locations"],
+        )
+        st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **languages** section of the entry")
+        if st.button("Validate: languages"):
+            entry_dict["languages"]["language_names"] = new_lang_list
+            entry_dict["languages"]["language_comments"] = new_lang_comment
+            entry_dict["languages"]["language_regions"] = new_region_list
+            entry_dict["languages"]["validated"] = True

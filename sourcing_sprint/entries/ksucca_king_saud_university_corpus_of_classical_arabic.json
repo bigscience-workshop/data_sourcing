@@ -13,11 +13,10 @@
       "ar-CLS"
     ],
     "language_comments": "Historical Arabic texts from the seventh until early eleventh century CE",
-    "language_locations_region": [
+    "language_locations": [
       "Northern Africa",
       "Western Asia"
     ],
-    "language_locations_nation": [],
     "validated": false
   },
   "custodian": {
