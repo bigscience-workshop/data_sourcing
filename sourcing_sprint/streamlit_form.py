@@ -181,7 +181,7 @@ def make_choro_map(resource_counts, marker_thres=0):
                 lon = sum(longitudes) / len(longitudes)
                 MarkerWithProps(
                     location=[lat, lon],
-                    popup=f"Country : {name}<br> \n Resources : {count} <br>",
+                    popup=f"{'Region' if name in region_tree else 'Country'} : {name}<br> \n Resources : {count} <br>",
                     props={"name": name, "resources": count},
                 ).add_to(marker_cluster)
     # for choropleth, add counts to all countries in a region
