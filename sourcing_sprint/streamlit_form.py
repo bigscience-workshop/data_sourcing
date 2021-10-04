@@ -258,6 +258,8 @@ st.set_page_config(
     initial_sidebar_state="auto",
 )
 
+query_params = st.experimental_get_query_params()
+
 page_description = """
 # BigScience Data Catalogue
 
@@ -274,6 +276,7 @@ Choose which functionality you want to make use of below.
 """
 st.sidebar.markdown(page_description, unsafe_allow_html=True)
 
+mode_short_list = ["add", "viz", "val"]
 app_mode = st.sidebar.radio(
     label="App mode:",
     options=[
@@ -281,6 +284,7 @@ app_mode = st.sidebar.radio(
         "Explore the current catalogue",
         "Validate an existing entry",
     ],
+    index=mode_short_list.index(query_params.get("mode", ["add"])[0])
 )
 add_mode = app_mode == "Add a new entry"
 viz_mode = app_mode == "Explore the current catalogue"
@@ -528,7 +532,7 @@ if entry_dict["type"] in ["primary", "processed"]:
                 help="If the data source is a website or collection of files, please provided the top-level URL or location of the file directory",
             )
         else:
-            entry_dict["availability"]["procurement"]["download_url"] = st.text_input(
+            entry_dict["availability"]["procurement"]["download_email"] = st.text_input(
                 label="Please provide the email of the person to contact to obtain the data",
                 value=entry_dict["custodian"]["contact_email"],
                 help="if it is different from the contact email entered for the data custodian in the **Data owner or custodian** section above",
@@ -925,10 +929,10 @@ with val_col.expander(
         st.write("Note: this dataset has already been validated")
     st.markdown(f"##### Validating: {entry_types.get(entry_dict['type'], '')} - {entry_dict['description']['name']}\n\n{entry_dict['description']['description']}")
 
-if val_mode and "languages" in entry_dict:
+if "languages" in entry_dict:
     val_col.markdown("### Entry Languages and Locations" if val_mode else "")
     with val_col.expander(
-        "Language names and represented regions" if val_mode else "",
+        "Validate language names and represented regions" if val_mode else "",
         expanded=val_mode,
     ):
         language_choices = sorted(set(
@@ -957,17 +961,17 @@ if val_mode and "languages" in entry_dict:
             options=region_choices,
             default=entry_dict["languages"]["language_locations"],
         )
-        st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **languages** section of the entry")
+        st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **languages** section of the entry" if val_mode else "")
         if st.checkbox("Validate: languages"):
             entry_dict["languages"]["language_names"] = new_lang_list
             entry_dict["languages"]["language_comments"] = new_lang_comment
             entry_dict["languages"]["language_locations"] = new_region_list
             entry_dict["languages"]["validated"] = True
 
-if val_mode and "custodian" in entry_dict:
+if "custodian" in entry_dict:
     val_col.markdown("### Entry Representative, Owner, or Custodian" if val_mode else "")
     with val_col.expander(
-        ("Advocate or organization information" if entry_dict["type"] == "organization" else "Data owner or custodian")
+        ("Validate advocate or organization information" if entry_dict["type"] == "organization" else "Validate data owner or custodian")
         if val_mode
         else "",
         expanded=val_mode,
@@ -1006,7 +1010,7 @@ if val_mode and "custodian" in entry_dict:
             label="The following URL is recorded as a place to find more information about the entity",
             value=entry_dict["custodian"]["additional"]
         )
-        st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **custodian** section of the entry")
+        st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **custodian** section of the entry" if val_mode else "")
         if st.checkbox("Validate: custodian"):
             entry_dict["custodian"]["name"] = new_custodian_name
             entry_dict["custodian"]["type"] = new_custodian_type
@@ -1015,6 +1019,180 @@ if val_mode and "custodian" in entry_dict:
             entry_dict["custodian"]["contact_email"] = new_custodian_contact_email
             entry_dict["custodian"]["additional"] = new_custodian_additional
             entry_dict["custodian"]["validated"] = True
+
+if "availability" in entry_dict:
+    if entry_dict["type"] in ["primary", "processed"]:
+        val_col.markdown("### Availability of the Resource: Procuring, Licenses, PII" if val_mode else "")
+        with val_col.expander(
+            "Validate Procuring, Licenses, and PII" if val_mode else "",
+            expanded=val_mode,
+        ):
+            download_options = [
+                "Yes - it has a direct download link or links",
+                "Yes - after signing a user agreement",
+                "No - but the current owners/custodians have contact information for data queries",
+                "No - we would need to spontaneously reach out to the current owners/custodians",
+            ]
+            new_for_download = st.radio(
+                label="Can the data be obtained online?",
+                options=download_options,
+                index=download_options.index(entry_dict["availability"]["procurement"]["for_download"]),
+                key="validate_for_download"
+            )
+            if "Yes -" in entry_dict["availability"]["procurement"]["for_download"]:
+                new_download_email = ""
+                new_download_url = st.text_input(
+                    label="Please provide the URL where the data can be downloaded",
+                    value=entry_dict["availability"]["procurement"]["download_url"],
+                    key="validate_download_url"
+                )
+            else:
+                new_download_url = ""
+                new_download_email = st.text_input(
+                    label="Please provide the email of the person to contact to obtain the data",
+                    value=entry_dict["availability"]["procurement"]["download_email"],
+                    key="validate_download_email",
+                )
+            has_licenses_options = ["Yes", "No", "Unclear"]
+            new_has_licenses = st.radio(
+                label="Does the language data in the resource come with explicit licenses of terms of use?",
+                options=has_licenses_options,
+                index=has_licenses_options.index(entry_dict["availability"]["licensing"]["has_licenses"]),
+                key="validate_has_licenses",
+            )
+            if new_has_licenses == "Yes":
+                new_license_properties = st.multiselect(
+                    label="Which of the following best characterize the licensing status of the data? Select all that apply:",
+                    options=[
+                        "public domain",
+                        "multiple licenses",
+                        "copyright - all rights reserved",
+                        "open license",
+                        "research use",
+                        "non-commercial use",
+                        "do not distribute",
+                    ],
+                    default=entry_dict["availability"]["licensing"]["license_properties"],
+                    key="validate_license_properties",
+                )
+                new_license_list = st.multiselect(
+                    label=f"Under which licenses is the data shared?",
+                    options=licenses,
+                    default=entry_dict["availability"]["licensing"]["license_list"],
+                    key="validate_license_list"
+                )
+                new_license_text = st.text_area(
+                    label=f"If the resource has explicit terms of use or license text, please copy it in the following area",
+                    value=entry_dict["availability"]["licensing"]["license_text"],
+                    key="validate_license_text_explicit",
+                )
+            else:
+                new_license_properties = []
+                new_license_list = []
+                new_license_text = st.text_area(
+                    label="Please provide your best assessment of whether the data can be used to train models while respecting the rights and wishes of the data creators and custodians. This field will serve as a starting point for further investigation.",
+                    value=entry_dict["availability"]["licensing"]["license_text"],
+                    key="validate_license_text_other",
+                )
+            new_has_pii = st.radio(
+                label="Does the language data in the resource contain personally identifiable or sensitive information?",
+                help="See the guide for descriptions and examples. The default answer should be 'Yes'. Answers of 'No' and 'Unclear' require justifications.",
+                options=["Yes", "Yes - text author name only", "No", "Unclear"],
+                index=["Yes", "Yes - text author name only", "No", "Unclear"].index(entry_dict["availability"]["pii"]["has_pii"]),
+                key="validate_has_pii"
+            )
+            new_generic_pii_likely = ""
+            new_numeric_pii_likely = ""
+            new_sensitive_pii_likely = ""
+            new_generic_pii_list = []
+            new_numeric_pii_list = []
+            new_sensitive_pii_list = []
+            new_no_pii_justification_class = ""
+            new_no_pii_justification_text = ""
+            if new_has_pii == "Yes":
+                new_generic_pii_likely = st.selectbox(
+                    label="How likely is the data to contain instances of generic PII, such as names or addresses?",
+                    options=["", "very likely", "somewhat likely", "unlikely", "none"],
+                    index=["", "very likely", "somewhat likely", "unlikely", "none"].index(entry_dict["availability"]["pii"]["generic_pii_likely"]),
+                    key="validate_generic_pii_likely"
+                )
+                if "likely" in new_generic_pii_likely:
+                    new_generic_pii_list = st.multiselect(
+                        label=f"What type of generic PII (e.g. names, emails, etc,) is the data most likely to contain?",
+                        options=pii_categories["generic"],
+                        default=entry_dict["availability"]["pii"]["generic_pii_list"],
+                        key="validate_generic_pii_list"
+                    )
+                new_numeric_pii_likely = st.selectbox(
+                    label="How likely is the data to contain instances of numeric PII, such as phone or social security numbers?",
+                    options=["", "very likely", "somewhat likely", "unlikely", "none"],
+                    index=["", "very likely", "somewhat likely", "unlikely", "none"].index(entry_dict["availability"]["pii"]["numeric_pii_likely"]),
+                    key="validate_numeric_pii_likely"
+                )
+                if "likely" in new_numeric_pii_likely:
+                    new_numeric_pii_list = st.multiselect(
+                        label=f"What type of numeric PII (e.g. phone numbers, health ID numbers, etc,) is the data most likely to contain?",
+                        options=pii_categories["numbers"],
+                        default=entry_dict["availability"]["pii"]["numeric_pii_list"],
+                        key="validate_numeric_pii_list"
+                    )
+                new_sensitive_pii_likely = st.selectbox(
+                    label="How likely is the data to contain instances of numeric PII, such as phone or social security numbers?",
+                    options=["", "very likely", "somewhat likely", "unlikely", "none"],
+                    index=["", "very likely", "somewhat likely", "unlikely", "none"].index(entry_dict["availability"]["pii"]["sensitive_pii_likely"]),
+                    key="validate_sensitive_pii_likely"
+                )
+                if "likely" in new_sensitive_pii_likely:
+                    new_sensitive_pii_list = st.multiselect(
+                        label=f"What type of sensitive PII (e.g. health status, poilitcal opinions, sexual orientation, etc.) is the data most likely to contain?",
+                        options=pii_categories["sensitive"],
+                        default=entry_dict["availability"]["pii"]["sensitive_pii_list"],
+                        key="validate_sensitive_pii_list"
+                    )
+            else:
+                no_pii_justification_class_options = [
+                    "general knowledge not written by or referring to private persons",
+                    "fictional text",
+                    "other",
+                ]
+                new_no_pii_justification_class = st.radio(
+                    label="What is the justification for assuming that this resource does not contain any personally identifiable information?",
+                    options=no_pii_justification_class_options,
+                    index=no_pii_justification_class_options.index(entry_dict["availability"]["pii"]["no_pii_justification_class"]),
+                    key="validate_no_pii_justification_class"
+                )
+                if new_no_pii_justification_class == "other":
+                    new_no_pii_justification_text = st.text_area(
+                        label=f"If there is another reason for this resource not containing PII, please state why in the textbox below.",
+                        value=entry_dict["availability"]["pii"]["no_pii_justification_text"],
+                        key="validate_no_pii_justification_text",
+                    )
+            if st.checkbox("Validate: availability"):
+                entry_dict["availability"] = {
+                        "procurement": {
+                            "for_download": new_for_download,
+                            "download_url": new_download_url,
+                            "download_email": new_download_email,
+                        },
+                        "licensing": {
+                            "has_licenses": new_has_licenses,
+                            "license_text": new_license_text,
+                            "license_properties": new_license_properties,
+                            "license_list": new_license_list,
+                        },
+                        "pii": {
+                            "has_pii": new_has_pii,
+                            "generic_pii_likely": new_generic_pii_likely,
+                            "generic_pii_list": new_generic_pii_list,
+                            "numeric_pii_likely": new_numeric_pii_likely,
+                            "numeric_pii_list": new_numeric_pii_list,
+                            "sensitive_pii_likely": new_sensitive_pii_likely,
+                            "sensitive_pii_list": new_sensitive_pii_list,
+                            "no_pii_justification_class": new_no_pii_justification_class,
+                            "no_pii_justification_text": new_no_pii_justification_text,
+                        },
+                        "validated": True,
+                    }
 
 # TODO: add all of the other validation sections
 
