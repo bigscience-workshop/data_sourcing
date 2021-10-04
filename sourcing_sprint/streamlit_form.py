@@ -170,7 +170,7 @@ def make_choro_map(resource_counts, marker_thres=0):
             country_center = country_centers[country_mappings["to_center"].get(name, name)]
             MarkerWithProps(
                 location=[country_center["latitude"], country_center["longitude"]],
-                popup=f"Country : {name}<br> \n Resources : {count} <br>",
+                popup=f"{'Region' if name in region_tree else 'Country'} : {name}<br> \n Resources : {count} <br>",
                 props={"name": name, "resources": count},
             ).add_to(marker_cluster)
         # put a pin at the center of the region
