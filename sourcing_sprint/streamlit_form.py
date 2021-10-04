@@ -1,7 +1,9 @@
 import json
 import re
+from datetime import datetime
 from glob import glob
 from os.path import isfile
+from os.path import join as pjoin
 
 import folium
 import pandas as pd
@@ -63,6 +65,16 @@ MAX_COUNTRIES = 25
 ### Primary source categories
 primary_taxonomy = json.load(open("resources/primary_source_taxonomy.json", encoding="utf-8"))
 MAX_SOURCES = 25
+
+# entity categories
+custodian_types = [
+    "A private individual",
+    "A commercial entity",
+    "A library, museum, or archival institute",
+    "A university or research institution",
+    "A nonprofit/NGO (other)",
+    "A government organization",
+]
 
 ### Data accessibility
 # from Data Tooling docs
@@ -167,6 +179,19 @@ def load_catalogue():
     }
     return catalogue
 
+# check whether the entry can be written to the catalogue
+def can_save(entry_dct, submission_dct, adding_mode):
+    if entry_dct['uid'] == "" or isfile(pjoin("entries", f"{entry_dct['uid']}.json")):
+        return False, f"There is already an entry with `uid` {entry_dct['uid']}, you need to give your entry a different one before saving. You can look at the entry with this `uid` by switching to the **Validate an existing entry** mode of this app in the left sidebar."
+    if adding_mode and submission_dct["submitted_by"] == "":
+        return False, f"Please enter a name (or pseudonym) in the left sidebar before submitting this entry."
+    if not adding_mode and submission_dct["validated"] == "":
+        return False, f"Please enter a name (or pseudonym) in the left sidebar before validating this entry."
+    if adding_mode and entry_dict["custodian"]["contact_submitter"] and submission_dct["submitted_email"] == "":
+        return False, f"You said that you would be willing to reach out to the entity or organization. To do so, please enter an email we can use to follow up in the left sidebar."
+    else:
+        return True, ""
+
 ##################
 ## streamlit
 ##################
@@ -205,25 +230,38 @@ add_mode = app_mode == "Add a new entry"
 viz_mode = app_mode == "Explore the current catalogue"
 val_mode = app_mode == "Validate an existing entry"
 
-if add_mode:
+submission_info_dict = {
+    "entry_uid": "",
+    "submitted_by": "",
+    "submitted_email": "",
+    "submitted_date": "",
+    "validated_by": "",
+    "validated_date": "",
+}
+if add_mode or val_mode:
     with st.sidebar.form("submitter_information"):
-        submitter_name = st.text_input(label="Name of submitter:")
-        submitter_email = st.text_input(
+        user_name = st.text_input(label="Name of submitter:")
+        user_email = st.text_input(
             label="Email (optional, enter if you are available to follow up on this catalogue entry):"
         )
         submitted_info = st.form_submit_button("Submit self information")
+        if add_mode:
+            submission_info_dict["submitted_by"] = user_name
+            submission_info_dict["submitted_email"] = user_email
+        else:
+            submission_info_dict["validated_by"] = user_name
 
 st.markdown("#### BigScience Catalogue of Language Data and Resources\n---\n")
 
 # switch between expanded tabs
 if add_mode:
-    col_sizes = [60, 40, 5, 1, 5, 1]
+    col_sizes = [60, 40, 5, 1, 5, 1, 1]
 if viz_mode:
-    col_sizes = [5, 1, 100, 1, 5, 1]
+    col_sizes = [5, 1, 100, 1, 5, 1, 1]
 if val_mode:
-    col_sizes = [5, 1, 5, 1, 100, 1]
+    col_sizes = [5, 1, 5, 1, 60, 40, 1]
 
-form_col, display_col, viz_col, _, val_col, _ = st.columns(col_sizes)
+form_col, display_col, viz_col, _, val_col, val_display_col, _ = st.columns(col_sizes)
 
 ##################
 ## SECTION: Add a new entry
@@ -361,17 +399,7 @@ with form_col.expander(
         )
     entry_dict["custodian"]["type"] = st.selectbox(
         label="Entity type: is the organization, advocate, or data custodian...",
-        options=[
-            "",
-            "A private individual",
-            "A commercial entity",
-            "A library, museum, or archival institute",
-            "A university or research institution",
-            "A nonprofit/NGO (other)",
-            "A government organization",
-            "Unclear",
-            "other",
-        ],
+        options=[""] + custodian_types + ["other"],
     )
     if entry_dict["custodian"]["type"] == "other":
         entry_dict["custodian"]["type"] = st.text_input(
@@ -730,13 +758,24 @@ if entry_dict["type"] in ["primary", "processed"]:
 display_col.markdown("### Review and Save Entry" if add_mode else "")
 if add_mode:
     with display_col.expander("Show current entry" if add_mode else "", expanded=add_mode):
+        st.markdown("Do not forget to **save your entry** to the BigScience Data Catalogue!\n\nOnce you are done, please press the button below - this will either record the entry or tell you if there's anything you need to change first.")
+        if st.button("Save entry to catalogue"):
+            good_to_save, save_message = can_save(entry_dict, submission_info_dict, add_mode)
+            if good_to_save:
+                submission_info_dict["entry_uid"] = entry_dict['uid']
+                submission_info_dict["submitted_date"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+                json.dump(entry_dict, open(pjoin("entries", f"{entry_dict['uid']}.json"), "w", encoding="utf-8"))
+                json.dump(submission_info_dict, open(pjoin("entry_submitted_by", f"{entry_dict['uid']}.json"), "w", encoding="utf-8"))
+            else:
+                st.markdown("##### Unable to save\n" + save_message)
+        st.markdown(f"You are entering a new resource of type: *{entry_dict['type']}*")
+        st.write(entry_dict)
+        st.markdown("You can also download the entry as a `json` file with the following button:")
         st.download_button(
-            label="Download output as `json`",
+            label="Download entry dictionary",
             data=json.dumps(entry_dict, indent=2),
             file_name="default_entry_name.json" if entry_dict["uid"] == "" else f"{entry_dict['uid']}.json",
         )
-        st.markdown(f"You are entering a new resource of type: *{entry_dict['type']}*")
-        st.write(entry_dict)
 
 ##################
 ## SECTION: Explore the current catalogue
@@ -794,7 +833,7 @@ with val_col.expander(
     st.markdown(f"##### Validating: {entry_types.get(entry_dict['type'], '')} - {entry_dict['description']['name']}\n\n{entry_dict['description']['description']}")
 
 if val_mode and "languages" in entry_dict:
-    val_col.markdown("### Entry Languages and Locations" if add_mode else "")
+    val_col.markdown("### Entry Languages and Locations" if val_mode else "")
     with val_col.expander(
         "Language names and represented regions" if val_mode else "",
         expanded=val_mode,
@@ -829,5 +868,69 @@ if val_mode and "languages" in entry_dict:
         if st.button("Validate: languages"):
             entry_dict["languages"]["language_names"] = new_lang_list
             entry_dict["languages"]["language_comments"] = new_lang_comment
-            entry_dict["languages"]["language_regions"] = new_region_list
+            entry_dict["languages"]["language_locations"] = new_region_list
             entry_dict["languages"]["validated"] = True
+
+if val_mode and "custodian" in entry_dict:
+    val_col.markdown("### Entry Representative, Owner, or Custodian" if val_mode else "")
+    with val_col.expander(
+        ("Advocate or organization information" if entry_dict["type"] == "organization" else "Data owner or custodian")
+        if val_mode
+        else "",
+        expanded=val_mode,
+    ):
+        if entry_dict["type"] == "organization":
+            new_custodian_name = entry_dict["description"]["name"]
+        else:
+             new_custodian_name = st.text_input(
+                label="The entry currently records the following name for the data custodian.",
+                value=entry_dict["custodian"]["name"]
+            )
+        custodian_type_choices = [""] + sorted(set(custodian_types + [entry_dict["custodian"]["type"]])) + ["other"]
+        new_custodian_type = st.selectbox(
+            label="The current category of the data custodian, person, or organization is the following.",
+            options=custodian_type_choices,
+            index=custodian_type_choices.index(entry_dict["custodian"]["type"])
+        )
+        if new_custodian_type == "other":
+            new_custodian_type = st.text_input(
+                label="You entered `other` for the entity type, how would you categorize them?",
+            )
+        new_custodian_location = st.selectbox(
+            label="The entity is recoreded as being located or hosted in:",
+            options=countries,
+            index=countries.index(entry_dict["custodian"]["location"])
+        )
+        new_custodian_contact_name = st.text_input(
+            label="The following person is recorded as contact for the entity",
+            value=entry_dict["custodian"]["contact_name"],
+        )
+        new_custodian_contact_email = st.text_input(
+            label="Their contact email is recorded as:",
+            value=entry_dict["custodian"]["contact_email"],
+        )
+        new_custodian_additional = st.text_input(
+            label="The following URL is recorded as a place to find more information about the entity",
+            value=entry_dict["custodian"]["additional"]
+        )
+        st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **custodian** section of the entry")
+        if st.button("Validate: custodian"):
+            entry_dict["custodian"]["name"] = new_custodian_name
+            entry_dict["custodian"]["type"] = new_custodian_type
+            entry_dict["custodian"]["location"] = new_custodian_location
+            entry_dict["custodian"]["contact_name"] = new_custodian_contact_name
+            entry_dict["custodian"]["contact_email"] = new_custodian_contact_email
+            entry_dict["custodian"]["additional"] = new_custodian_additional
+            entry_dict["custodian"]["validated"] = True
+
+# TODO: add all of the other validation sections
+
+val_display_col.markdown("### Review and Save Entry" if val_mode else "")
+if val_mode:
+    with val_display_col.expander("Show current entry" if val_mode else "", expanded=val_mode):
+        st.download_button(
+            label="Download output as `json`",
+            data=json.dumps(entry_dict, indent=2),
+            file_name="default_entry_name.json" if entry_dict["uid"] == "" else f"{entry_dict['uid']}.json",
+        )
+        st.write(entry_dict)
