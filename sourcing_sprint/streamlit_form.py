@@ -943,7 +943,7 @@ if val_mode:
                 json.dump(validation_info_dict, open(pjoin("entry_submitted_by", f"{entry_dict['uid']}-validated-{friendly_date}.json"), "w", encoding="utf-8"), indent=2)
             else:
                 st.markdown("##### Unable to save\n" + save_message)
-        st.markdown(f"You are entering a new resource of type: *{entry_dict['type']}*")
+        st.markdown(f"You are validating a resource of type: *{entry_dict['type']}*")
         st.write(entry_dict)
         st.markdown("You can also download the entry as a `json` file with the following button:")
         st.download_button(
