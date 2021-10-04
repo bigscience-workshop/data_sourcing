@@ -1,14 +1,14 @@
 import json
 import re
+from glob import glob
+from os.path import isfile
 
 import folium
 import pandas as pd
 import streamlit as st
 from folium import Marker
 from folium.plugins import MarkerCluster
-from glob import glob
 from jinja2 import Template
-from os.path import isfile
 from streamlit_folium import folium_static
 
 ##################
@@ -341,7 +341,7 @@ with form_col.expander(
         format_func=lambda x: f"{x}: {', '.join(region_tree.get(x, [x]))}",
     )
     entry_dict["languages"]["language_locations"] += st.multiselect(
-        label="Countries, nations, and regions. Select all that apply from the following",
+        label="Countries, nations, regions, and territories. Select all that apply from the following",
         options=countries + ["other"],
     )
 
