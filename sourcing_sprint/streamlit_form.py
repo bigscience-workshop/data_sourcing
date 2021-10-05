@@ -712,7 +712,6 @@ if entry_dict["type"] == "processed":
         "List primary sources" if add_mode else "",
         expanded=add_mode and not collapse_all,
     ):
-        processed_sources = {}
         st.write("Please provide as much information as you can find about the data's primary sources:")
         entry_dict["processed_from_primary"]["from_primary"] = st.radio(
             label="Was the language data in the dataset produced at the time of the dataset creation or was it taken from a primary source?",
@@ -730,6 +729,16 @@ if entry_dict["type"] == "processed":
                 ],
                 index=1,
             )
+            if entry_dict["processed_from_primary"]["primary_availability"] != "No - the dataset curators kept the source data secret":
+                primary_catalogue = dict([(entry['uid'], entry) for entry in load_catalogue().values() if entry["type"] == "primary"])
+                primary_keys = list(primary_catalogue.keys())
+                entry_dict["processed_from_primary"]["from_primary_entries"] = st.multiselect(
+                    label="Please select all primary sources for this dataset that are available in this catalogue",
+                    options=primary_keys,
+                    format_func=lambda uid: f"{primary_catalogue[uid]['uid']} | {primary_catalogue[uid]['description']['name']}",
+                    default=[],
+                    key="form_from_primary_entries"
+                )
             if "Yes" in entry_dict["processed_from_primary"]["primary_availability"]:
                 entry_dict["processed_from_primary"]["primary_types"] = st.multiselect(
                     label="What kind of primary sources did the data curators use to make this dataset?",
@@ -1287,6 +1296,16 @@ if "processed_from_primary" in entry_dict and entry_dict["type"] == "processed":
                 index=primary_vailability_list.index(entry_dict["processed_from_primary"]["primary_availability"]),
                 key="validate_primary_availability",
             )
+            if new_processed_from_primary["primary_availability"] != "No - the dataset curators kept the source data secret":
+                primary_catalogue = dict([(entry['uid'], entry) for entry in load_catalogue().values() if entry["type"] == "primary"])
+                primary_keys = list(primary_catalogue.keys())
+                new_processed_from_primary["from_primary_entries"] = st.multiselect(
+                    label="Please select all primary sources for this dataset that are available in this catalogue",
+                    options=primary_keys,
+                    format_func=lambda uid: f"{primary_catalogue[uid]['uid']} | {primary_catalogue[uid]['description']['name']}",
+                    default=entry_dict["processed_from_primary"].get("from_primary_entries", []),
+                    key="validate_from_primary_entries"
+                )
             if "Yes" in new_processed_from_primary["primary_availability"]:
                 primary_types_list = [f"web | {w}" for w in primary_taxonomy["website"]] + primary_taxonomy["collection"]
                 new_processed_from_primary["primary_types"] = st.multiselect(
