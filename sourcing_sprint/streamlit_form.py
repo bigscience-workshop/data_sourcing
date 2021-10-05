@@ -312,17 +312,18 @@ with st.sidebar.expander("User information", expanded=add_mode or val_mode):
     else:
         submission_info_dict["validated_by"] = user_name
 
-st.markdown("#### BigScience Catalogue of Language Data and Resources\n---\n")
-
+st.markdown("#### BigScience Catalogue of Language Data and Resources")
+collapse_all = st.checkbox("Collapse all fields", value=True)
+st.markdown("---\n")
 # switch between expanded tabs
 if add_mode:
-    col_sizes = [60, 40, 5, 1, 5, 1, 1]
+    col_sizes = [100, 5, 1, 5, 1]
 if viz_mode:
-    col_sizes = [5, 1, 100, 1, 5, 1, 1]
+    col_sizes = [5, 100, 1, 5, 1]
 if val_mode:
-    col_sizes = [5, 1, 5, 1, 60, 40, 1]
+    col_sizes = [5, 5, 1, 100, 1]
 
-form_col, display_col, viz_col, _, val_col, val_display_col, _ = st.columns(col_sizes)
+form_col, viz_col, _, val_col, _ = st.columns(col_sizes)
 
 ##################
 ## SECTION: Add a new entry
@@ -357,7 +358,7 @@ entry_dict = {
 form_col.markdown("### Entry Category, Name, ID, Homepage, Description" if add_mode else "")
 with form_col.expander(
     "General information" if add_mode else "",
-    expanded=add_mode,
+    expanded=add_mode and not collapse_all,
 ):
     st.markdown("##### Entry type, name, and summary")  # TODO add collapsible instructions
     st.markdown(entry_type_help if add_mode else "")
@@ -388,7 +389,7 @@ with form_col.expander(
 form_col.markdown("### Entry Languages and Locations" if add_mode else "")
 with form_col.expander(
     "Language names and represented regions" if add_mode else "",
-    expanded=add_mode,
+    expanded=add_mode and not collapse_all,
 ):
     language_help_text = """
     ##### Whose language is represented in the entry?
@@ -421,15 +422,15 @@ with form_col.expander(
             format_func=lambda x: f"{x} | {language_lists['arabic'][x]}",
             help="If the dialect you are looking for is not in the present list, you can add it through the **other languages** form below",
         )
-    entry_dict["languages"]["language_comments"] = st.text_input(
-        label="Please add any additional comments about the language varieties here (e.g., significant presence of AAVE or code-switching)"
-    )
     if "Programming Language" in entry_dict["languages"]["language_names"]:
         entry_dict["languages"]["language_names"] += st.multiselect(
             label="The entry covers programming languages, select any that apply here:",
             options= [x["item"]["name"] for x in prog_langs],
             help="If the language you are looking for is not in the present list, you can add it through the **other languages** form below",
         )
+    entry_dict["languages"]["language_comments"] = st.text_input(
+        label="Please add any additional comments about the language varieties here (e.g., significant presence of AAVE or code-switching)"
+    )
     if st.checkbox("Show other languages"):
         entry_dict["languages"]["language_names"] = st.multiselect(
             label="For entries that cover languages outside of the current BigScience list, select all that apply here:",
@@ -455,7 +456,7 @@ with form_col.expander(
     ("Advocate or organization information" if entry_dict["type"] == "organization" else "Data owner or custodian")
     if add_mode
     else "",
-    expanded=add_mode,
+    expanded=add_mode and not collapse_all,
 ):
     st.markdown((entry_organization_text if entry_dict["type"] == "organization" else entry_custodian_text) if add_mode else "")
     if entry_dict["type"] == "organization":
@@ -522,7 +523,7 @@ if entry_dict["type"] in ["primary", "processed"]:
     }
     with form_col.expander(
         "Obtaining the data: online availability and data owner/custodian" if add_mode else "",
-        expanded=add_mode,
+        expanded=add_mode and not collapse_all,
     ):
         st.markdown("##### Availability for download")
         entry_dict["availability"]["procurement"]["for_download"] = st.radio(
@@ -549,7 +550,7 @@ if entry_dict["type"] in ["primary", "processed"]:
 
     with form_col.expander(
         "Data licenses and Terms of Service" if add_mode else "",
-        expanded=add_mode,
+        expanded=add_mode and not collapse_all,
     ):
         st.write("Please provide as much information as you can find about the data's licensing and terms of use:")
         entry_dict["availability"]["licensing"]["has_licenses"] = st.radio(
@@ -587,7 +588,7 @@ if entry_dict["type"] in ["primary", "processed"]:
 
     with form_col.expander(
         "Personal Identifying Information" if add_mode else "",
-        expanded=add_mode,
+        expanded=add_mode and not collapse_all,
     ):
         st.write(
             "Please provide as much information as you can find about the data's contents related to personally identifiable and sensitive information:"
@@ -659,7 +660,7 @@ if entry_dict["type"] == "primary":
     }
     with form_col.expander(
         "Source category" if add_mode else "",
-        expanded=add_mode,
+        expanded=add_mode and not collapse_all,
     ):
         primary_tax_top = st.selectbox(
             label="Is the resource best described as a:",
@@ -706,7 +707,7 @@ if entry_dict["type"] == "processed":
     }
     with form_col.expander(
         "List primary sources" if add_mode else "",
-        expanded=add_mode,
+        expanded=add_mode and not collapse_all,
     ):
         processed_sources = {}
         st.write("Please provide as much information as you can find about the data's primary sources:")
@@ -758,7 +759,7 @@ if entry_dict["type"] in ["primary", "processed"]:
     }
     with form_col.expander(
         "Media type" if add_mode else "",
-        expanded=add_mode,
+        expanded=add_mode and not collapse_all,
     ):
         st.write("Please provide information about the language data formats covered in the entry")
         entry_dict["media"]["category"] = st.multiselect(
@@ -801,7 +802,7 @@ if entry_dict["type"] in ["primary", "processed"]:
 
     with form_col.expander(
         "Media amounts" if add_mode else "",
-        expanded=add_mode,
+        expanded=add_mode and not collapse_all,
     ):
         st.write("In order to estimate the amount of data in the dataset or primary source, we need a approximate count of the number of instances and the typical instance size therein.")
         entry_dict["media"]["instance_type"] = st.selectbox(
@@ -822,9 +823,9 @@ if entry_dict["type"] in ["primary", "processed"]:
         )
 
 # visualize and download
-display_col.markdown("### Review and Save Entry" if add_mode else "")
+form_col.markdown("### Review and Save Entry" if add_mode else "")
 if add_mode:
-    with display_col.expander("Show current entry" if add_mode else "", expanded=add_mode):
+    with form_col.expander("Show current entry" if add_mode else "", expanded=add_mode):
         st.markdown("Do not forget to **save your entry** to the BigScience Data Catalogue!\n\nOnce you are done, please press the button below - this will either record the entry or tell you if there's anything you need to change first.")
         if st.button("Save entry to catalogue"):
             good_to_save, save_message = can_save(entry_dict, submission_info_dict, add_mode)
@@ -848,7 +849,7 @@ if add_mode:
 ## SECTION: Explore the current catalogue
 ##################
 viz_col.markdown("### Select entries to visualize" if viz_mode else "")
-with viz_col.expander("Select resources to visualize" if viz_mode else "", expanded=viz_mode):
+with viz_col.expander("Select resources to visualize" if viz_mode else "", expanded=viz_mode and not collapse_all):
     if viz_mode:
         st.markdown("##### Select entries by category, language, type of custodian or media")
         st.markdown(
@@ -905,17 +906,26 @@ with viz_col.expander("Map of entries" if viz_mode else "", expanded=viz_mode):
         world_map = make_choro_map(filtered_counts)
         folium_static(world_map, width=1150, height=600)
 
-viz_col.markdown("### Search entry names and descriptions" if viz_mode else "")
-with viz_col.expander("ElasticSearch of resource names and descriptions" if viz_mode else "", expanded=viz_mode):
+with viz_col.expander("View selected resources" if viz_mode else "", expanded=viz_mode and not collapse_all):
     if viz_mode:
-        st.write("TODO: implement ElasticSearch index and enable search here")
-        st.write("Meanwhile, the full list of entries corresponding to the selection above can be found here:")
+        st.write("You can further select locations to select entries from here:")
+        filter_region_choices = sorted(set(
+            [loc for entry in filtered_catalogue for loc in ([entry["custodian"]["location"]] if show_by_org else entry["languages"]["language_locations"])]
+        ))
+        filter_locs = st.multiselect(
+            "View entries from the following locations:",
+            options=filter_region_choices
+        )
+        filter_loc_dict = {"custodian": {"location": filter_locs}} if show_by_org else {"languages": {"language_locations": filter_locs}}
+        filtered_catalogue_by_loc = [
+            entry for entry in filtered_catalogue if filter_entry(entry, filter_loc_dict)
+        ]
         view_entry = st.selectbox(
             label="Select an entry to see more detail:",
-            options=filtered_catalogue,
+            options=filtered_catalogue_by_loc,
             format_func=lambda entry: f"{entry['uid']} | {entry['description']['name']} -- {entry['description']['description']}"
         )
-        st.markdown(f"##### *UID:* {view_entry['uid']} - *Name:* {view_entry['description']['name']}\n\n{view_entry['description']['description']}")
+        st.markdown(f"##### *Type:* {view_entry['type']} *UID:* {view_entry['uid']} - *Name:* {view_entry['description']['name']}\n\n{view_entry['description']['description']}")
 
 ##################
 ## SECTION: Validate an existing entry
@@ -923,7 +933,7 @@ with viz_col.expander("ElasticSearch of resource names and descriptions" if viz_
 val_col.markdown("### Entry selection" if val_mode else "")
 with val_col.expander(
     "Select catalogue entry to validate" if val_mode else "",
-    expanded=val_mode,
+    expanded=val_mode and not collapse_all,
 ):
     catalogue = load_catalogue()
     entry_id = st.selectbox(
@@ -942,7 +952,7 @@ if "languages" in entry_dict:
     val_col.markdown("### Entry Languages and Locations" if val_mode else "")
     with val_col.expander(
         "Validate language names and represented regions" if val_mode else "",
-        expanded=val_mode,
+        expanded=val_mode and not collapse_all,
     ):
         language_choices = sorted(set(
             list(language_lists["language_groups"].keys()) + \
@@ -983,7 +993,7 @@ if "custodian" in entry_dict:
         ("Validate advocate or organization information" if entry_dict["type"] == "organization" else "Validate data owner or custodian")
         if val_mode
         else "",
-        expanded=val_mode,
+        expanded=val_mode and not collapse_all,
     ):
         if entry_dict["type"] == "organization":
             new_custodian_name = entry_dict["description"]["name"]
@@ -1034,7 +1044,7 @@ if "availability" in entry_dict:
         val_col.markdown("### Availability of the Resource: Procuring, Licenses, PII" if val_mode else "")
         with val_col.expander(
             "Validate Procuring, Licenses, and PII" if val_mode else "",
-            expanded=val_mode,
+            expanded=val_mode and not collapse_all,
         ):
             download_options = [
                 "Yes - it has a direct download link or links",
@@ -1205,9 +1215,9 @@ if "availability" in entry_dict:
 
 # TODO: add all of the other validation sections
 
-val_display_col.markdown("### Review and Save Entry" if val_mode else "")
+val_col.markdown("### Review and Save Entry" if val_mode else "")
 if val_mode:
-    with val_display_col.expander("Show current entry" if val_mode else "", expanded=val_mode):
+    with val_col.expander("Show current entry" if val_mode else "", expanded=val_mode):
         st.markdown("Do not forget to **save your work** to the BigScience Data Catalogue!\n\nOnce you are done, please press the button below - this will either record the entry or tell you if there's anything you need to change first.")
         if st.button("Save validated entry to catalogue"):
             good_to_save, save_message = can_save(entry_dict, submission_info_dict, add_mode)
