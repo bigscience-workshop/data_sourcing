@@ -248,6 +248,9 @@ def can_save(entry_dct, submission_dct, adding_mode):
         return False, f"Please enter a name (or pseudonym) in the left sidebar before validating this entry."
     if adding_mode and entry_dict["custodian"]["contact_submitter"] and submission_dct["submitted_email"] == "":
         return False, f"You said that you would be willing to reach out to the entity or organization. To do so, please enter an email we can use to follow up in the left sidebar."
+    if not adding_mode and not all([v.get("validated", False) for k, v in entry_dict.items() if isinstance(v, dict)]):
+        unvalidated = [k for k, v in entry_dict.items() if isinstance(v, dict) and not v.get("validated", False)]
+        return False, f"Some of the fields haven't been validated: {unvalidated}"
     else:
         return True, ""
 
@@ -1213,7 +1216,170 @@ if "availability" in entry_dict:
                         "validated": True,
                     }
 
-# TODO: add all of the other validation sections
+if "source_category" in entry_dict and entry_dict["type"] == "primary":
+    val_col.markdown("### Primary Source Type" if val_mode else "")
+    with val_col.expander(
+        "Validate source category" if val_mode else "",
+        expanded=val_mode and not collapse_all,
+    ):
+        source_type_list = [""] + ["collection", "website", "other"]
+        if entry_dict["source_category"]["category_type"] not in source_type_list:
+            source_type_list = source_type_list + [entry_dict["source_category"]["category_type"]]
+        primary_tax_top = st.selectbox(
+            label="Is the resource best described as a:",
+            options=source_type_list,
+            index=source_type_list.index(entry_dict["source_category"]["category_type"]),
+            key="validate_category_type",
+        )
+        if primary_tax_top == "website":
+            source_web_list = [""] + primary_taxonomy["website"]
+            if entry_dict["source_category"]["category_web"] not in source_web_list:
+                source_web_list = source_web_list + [entry_dict["source_category"]["category_web"]]
+            primary_tax_web = st.selectbox(
+                label="What kind of website?",
+                options=source_web_list,
+                index=source_web_list.index(entry_dict["source_category"]["category_web"]),
+                key="validate_category_web",
+            )
+        else:
+            primary_tax_web = ""
+        if primary_tax_top == "collection" or "collection" in primary_tax_web:
+            source_media_list = [""] + primary_taxonomy["collection"]
+            if entry_dict["source_category"]["category_media"] not in source_media_list:
+                source_media_list = source_media_list + [entry_dict["source_category"]["category_media"]]
+            primary_tax_col = st.selectbox(
+                label="What kind of collection?",
+                options=source_media_list,
+                index=source_media_list.index(entry_dict["source_category"]["category_media"]),
+                key="validate_source_media",
+            )
+        else:
+            primary_tax_col = ""
+        if st.checkbox("Validate: source category"):
+            entry_dict["source_category"]["category_type"] = primary_tax_top
+            entry_dict["source_category"]["category_web"] = primary_tax_web
+            entry_dict["source_category"]["category_media"] = primary_tax_col
+            entry_dict["source_category"]["validated"] = True
+
+if "processed_from_primary" in entry_dict and entry_dict["type"] == "processed":
+    val_col.markdown("### Primary Sources of the Processed Dataset" if val_mode else "")
+    with val_col.expander(
+        "Validate list of primary sources" if val_mode else "",
+        expanded=val_mode and not collapse_all,
+    ):
+        new_processed_from_primary = {}
+        new_processed_from_primary["from_primary"] = st.radio(
+            label="Was the language data in the dataset produced at the time of the dataset creation or was it taken from a primary source?",
+            options=["Original data", "Taken from primary source"],
+            index=["Original data", "Taken from primary source"].index(entry_dict["processed_from_primary"]["from_primary"]),
+            key="validate_from_primary",
+        )
+        if new_processed_from_primary["from_primary"] == "Taken from primary source":
+            primary_vailability_list = [
+                "Yes - they are fully available",
+                "Yes - their documentation/homepage/description is available",
+                "No - the dataset curators describe the primary sources but they are fully private",
+                "No - the dataset curators kept the source data secret",
+            ]
+            new_processed_from_primary["primary_availability"] = st.radio(
+                label="Are the primary sources supporting the dataset available to investigate?",
+                options=primary_vailability_list,
+                index=primary_vailability_list.index(entry_dict["processed_from_primary"]["primary_availability"]),
+                key="validate_primary_availability",
+            )
+            if "Yes" in new_processed_from_primary["primary_availability"]:
+                primary_types_list = [f"web | {w}" for w in primary_taxonomy["website"]] + primary_taxonomy["collection"]
+                new_processed_from_primary["primary_types"] = st.multiselect(
+                    label="What kind of primary sources did the data curators use to make this dataset?",
+                    options=primary_types_list,
+                    default=entry_dict["processed_from_primary"]["primary_types"],
+                    key="validate_primary_types",
+                )
+                primary_license_list = [
+                    "Yes - the source material has an open license that allows re-use",
+                    "Yes - the dataset has the same license as the source material",
+                    "Yes - the dataset curators have obtained consent from the source material owners",
+                    "Unclear / I don't know",
+                    "No - the license of the source material actually prohibits re-use in this manner",
+                ]
+                new_processed_from_primary["primary_license"] = st.radio(
+                    label="Is the license or commercial status of the source material compatible with the license of the dataset?",
+                    options=primary_license_list,
+                    index=primary_license_list.index(entry_dict["processed_from_primary"]["primary_license"]),
+                    key="validate_primary_license",
+                )
+        if st.checkbox("Validate: primary sources of dataset"):
+            new_processed_from_primary["validated"] = True
+            entry_dict["processed_from_primary"] = new_processed_from_primary
+
+if "media" in entry_dict and entry_dict["type"] in ["primary", "processed"]:
+    val_col.markdown("### Media type, format, size, and processing needs" if val_mode else "")
+    new_media = {}
+    with val_col.expander(
+        "Validate media type" if val_mode else "",
+        expanded=val_mode and not collapse_all,
+    ):
+        new_media["category"] = st.multiselect(
+            label="The language data in the resource is made up of:",
+            options=["text", "audiovisual", "image"],
+            default=entry_dict["media"]["category"],
+            key="validate_media_type"
+        )
+        if "text" in new_media["category"]:
+            text_format_list = sorted(set(entry_dict["media"]["text_format"] + ["plain text", "HTML", "PDF", "XML", "mediawiki"])) + ["other"]
+            new_media["text_format"] = st.multiselect(
+                label="What text formats are present in the entry?",
+                options=text_format_list,
+                default=entry_dict["media"]["text_format"],
+                key="validate_text_format",
+            )
+            new_media["text_is_transcribed"] = st.radio(
+                label="Was the text transcribed from another media format (e.g. audio or image)",
+                options=["Yes - audiovisual", "Yes - image", "No"],
+                index=["Yes - audiovisual", "Yes - image", "No"].index(entry_dict["media"]["text_is_transcribed"]),
+                key="validate_text_is_transcribed",
+            )
+        if "audiovisual" in new_media["category"] or "audiovisual" in new_media["text_is_transcribed"]:
+            audiovisual_format_list = sorted(set(entry_dict["media"]["audiovisual_format"] + ["mp4", "wav", "video"])) + ["other"]
+            new_media["audiovisual_format"] = st.multiselect(
+                label="What format or formats do the audiovisual data come in?",
+                options=audiovisual_format_list,
+                default=entry_dict["media"]["audiovisual_format"],
+                key="validate_audiovisual_format",
+            )
+        if "image" in new_media["category"] or "image" in new_media["text_is_transcribed"]:
+            image_format_list = sorted(set(entry_dict["media"]["image_format"] + ["JPEG", "PNG", "PDF", "TIFF"])) + ["other"]
+            new_media["image_format"] = st.multiselect(
+                label="What format or formats do the image data come in?",
+                options=image_format_list,
+                default=entry_dict["media"]["image_format"],
+                key="validate_image_format"
+            )
+        instance_type_list = ["", "article", "post", "dialogue", "episode", "book"]
+        if entry_dict["media"]["instance_type"] not in instance_type_list:
+            instance_type_list = instance_type_list + [entry_dict["media"]["instance_type"]]
+        instance_type_list = instance_type_list + ["other"]
+        new_media["instance_type"] = st.selectbox(
+            label="What does a single instance of language data consist of in this dataset/primary source?",
+            options=instance_type_list,
+            index=instance_type_list.index(entry_dict["media"]["instance_type"]),
+            key="validate_instance_list",
+        )
+        new_media["instance_count"] = st.selectbox(
+            label="Please estimate the number of instances in the dataset",
+            options=["", "n<100", "100<n<1K", "1K<n<10K", "10K<n<100K", "100K<n<1M", "1M<n<1B", "n>1B"],
+            index=["", "n<100", "100<n<1K", "1K<n<10K", "10K<n<100K", "100K<n<1M", "1M<n<1B", "n>1B"].index(entry_dict["media"]["instance_count"]),
+            key="validate_instance_count",
+        )
+        new_media["instance_size"] = st.selectbox(
+            label="How long do you expect each instance to be on average interms of number of words?",
+            options=["", "n<10", "10<n<100", "100<n<10,000", "n>10,000"],
+            index=["", "n<10", "10<n<100", "100<n<10,000", "n>10,000"].index(entry_dict["media"]["instance_size"]),
+            key="validate_instance_size"
+        )
+        if st.checkbox("Validate: media type and counts"):
+            new_media["validated"] = True
+            entry_dict["media"] = new_media
 
 val_col.markdown("### Review and Save Entry" if val_mode else "")
 if val_mode:
