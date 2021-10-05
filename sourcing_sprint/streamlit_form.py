@@ -58,6 +58,9 @@ country_mappings = json.load(open("resources/country_mappings.json", encoding="u
 bcp_47 = json.load(open("resources/bcp47.json", encoding="utf-8"))
 bcp_47_langs = [x for x in bcp_47["subtags"] if x["type"] == "language"]
 
+prog_langs = json.load(open("resources/programming_languages.json", encoding="utf-8"))
+prog_langs = [x for x in prog_langs["itemListElement"]]
+
 language_lists = json.load(open("resources/language_lists.json", encoding="utf-8"))
 MAX_LANGS = 25
 MAX_COUNTRIES = 25
@@ -421,6 +424,12 @@ with form_col.expander(
     entry_dict["languages"]["language_comments"] = st.text_input(
         label="Please add any additional comments about the language varieties here (e.g., significant presence of AAVE or code-switching)"
     )
+    if "Programming Language" in entry_dict["languages"]["language_names"]:
+        entry_dict["languages"]["language_names"] += st.multiselect(
+            label="The entry covers programming languages, select any that apply here:",
+            options= [x["item"]["name"] for x in prog_langs],
+            help="If the language you are looking for is not in the present list, you can add it through the **other languages** form below",
+        )
     if st.checkbox("Show other languages"):
         entry_dict["languages"]["language_names"] = st.multiselect(
             label="For entries that cover languages outside of the current BigScience list, select all that apply here:",
