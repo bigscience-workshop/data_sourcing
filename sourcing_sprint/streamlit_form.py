@@ -348,6 +348,7 @@ entry_dict = {
     },
     "custodian": {  # for Primary source or Language daset - data owner or custodian
         "name": "",
+        "in_catalogue": "",
         "type": "",
         "location": "",
         "contact_name": "",
@@ -463,39 +464,51 @@ with form_col.expander(
 ):
     st.markdown((entry_organization_text if entry_dict["type"] == "organization" else entry_custodian_text) if add_mode else "")
     if entry_dict["type"] == "organization":
-        entry_dict["custodian"]["name"] = entry_dict["description"]["name"]
+        entry_dict["custodian"]["in_catalogue"] = ""
     else:
+        organization_catalogue = dict([(entry['uid'], entry) for entry in load_catalogue().values() if entry["type"] == "organization"])
+        organization_keys = [""] + list(organization_catalogue.keys())
+        organization_catalogue[""] = {"uid": "", "description": {"name": ""}}
+        entry_dict["custodian"]["in_catalogue"] = st.selectbox(
+            label="Is the data owned or managed by an organization corresponding to a catalogue entry?",
+            options=organization_keys,
+            format_func=lambda uid: f"{organization_catalogue[uid]['uid']} | {organization_catalogue[uid]['description']['name']}",
+            index=0,
+            key="form_in_catalogue"
+        )
+    if entry_dict["custodian"]["in_catalogue"] == "":
         entry_dict["custodian"]["name"] = st.text_input(
             label="Please enter the name of the person or entity that owns or manages the data (data custodian)",
+            value=entry_dict["description"]["name"] if entry_dict["type"] == "organization" else "",
         )
-    entry_dict["custodian"]["type"] = st.selectbox(
-        label="Entity type: is the organization, advocate, or data custodian...",
-        options=[""] + custodian_types + ["other"],
-    )
-    if entry_dict["custodian"]["type"] == "other":
-        entry_dict["custodian"]["type"] = st.text_input(
-            label="You entered `other` for the entity type, how would you categorize them?",
+        entry_dict["custodian"]["type"] = st.selectbox(
+            label="Entity type: is the organization, advocate, or data custodian...",
+            options=[""] + custodian_types + ["other"],
         )
-    entry_dict["custodian"]["location"] = st.selectbox(
-        label="Where is the entity located or hosted?",
-        options=[""] + countries,
-        help="E.g.: where does the **main author of the dataset** work, where is the **website hosted**, what is the physical **location of the library**, etc.?",
-    )
-    entry_dict["custodian"]["contact_name"] = st.text_input(
-        label="Please enter the name of a contact person for the entity",
-        value=entry_dict["description"]["name"],
-    )
-    entry_dict["custodian"]["contact_email"] = st.text_input(
-        label="If available, please enter an email address that can be used to ask them about using/obtaining the data:"
-    )
-    entry_dict["custodian"]["contact_submitter"] = st.checkbox(
-        label="Would you be willing to reach out to the entity to ask them about collaborating or using their data (with support from the BigScience data sourcing team)?"
-        + " If so, make sure to fill out your email in the sidebar.",
-    )
-    entry_dict["custodian"]["additional"] = st.text_input(
-        label="Where can we find more information about the organization or data custodian? Please provide a URL",
-        help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists.",
-    )
+        if entry_dict["custodian"]["type"] == "other":
+            entry_dict["custodian"]["type"] = st.text_input(
+                label="You entered `other` for the entity type, how would you categorize them?",
+            )
+        entry_dict["custodian"]["location"] = st.selectbox(
+            label="Where is the entity located or hosted?",
+            options=[""] + countries,
+            help="E.g.: where does the **main author of the dataset** work, where is the **website hosted**, what is the physical **location of the library**, etc.?",
+        )
+        entry_dict["custodian"]["contact_name"] = st.text_input(
+            label="Please enter the name of a contact person for the entity",
+            value=entry_dict["description"]["name"],
+        )
+        entry_dict["custodian"]["contact_email"] = st.text_input(
+            label="If available, please enter an email address that can be used to ask them about using/obtaining the data:"
+        )
+        entry_dict["custodian"]["contact_submitter"] = st.checkbox(
+            label="Would you be willing to reach out to the entity to ask them about collaborating or using their data (with support from the BigScience data sourcing team)?"
+            + " If so, make sure to fill out your email in the sidebar.",
+        )
+        entry_dict["custodian"]["additional"] = st.text_input(
+            label="Where can we find more information about the organization or data custodian? Please provide a URL",
+            help="For example, please provide the URL of the web page with their contact information, the homepage of the organization, or even their Wikipedia page if it exists.",
+        )
 
 if entry_dict["type"] in ["primary", "processed"]:
     form_col.markdown("### Availability of the Resource: Procuring, Licenses, PII" if add_mode else "")
@@ -1008,39 +1021,56 @@ if "custodian" in entry_dict:
         expanded=val_mode and not collapse_all,
     ):
         if entry_dict["type"] == "organization":
-            new_custodian_name = entry_dict["description"]["name"]
+            new_in_catalogue = ""
         else:
-             new_custodian_name = st.text_input(
+            organization_catalogue = dict([(entry['uid'], entry) for entry in load_catalogue().values() if entry["type"] == "organization"])
+            organization_keys = [""] + list(organization_catalogue.keys())
+            organization_catalogue[""] = {"uid": "", "description": {"name": ""}}
+            new_in_catalogue = st.selectbox(
+                label="Is the data owned or managed by the following organization corresponding to a catalogue entry?",
+                options=organization_keys,
+                format_func=lambda uid: f"{organization_catalogue[uid]['uid']} | {organization_catalogue[uid]['description']['name']}",
+                index=organization_keys.index(entry_dict["custodian"].get("in_catalogue", "")),
+                key="validate_in_catalogue"
+            )
+        if new_in_catalogue == "":
+            new_custodian_name = st.text_input(
                 label="The entry currently records the following name for the data custodian.",
                 value=entry_dict["custodian"]["name"]
             )
-        custodian_type_choices = [""] + sorted(set(custodian_types + [entry_dict["custodian"]["type"]])) + ["other"]
-        new_custodian_type = st.selectbox(
-            label="The current category of the data custodian, person, or organization is the following.",
-            options=custodian_type_choices,
-            index=custodian_type_choices.index(entry_dict["custodian"]["type"])
-        )
-        if new_custodian_type == "other":
-            new_custodian_type = st.text_input(
-                label="You entered `other` for the entity type, how would you categorize them?",
+            custodian_type_choices = [""] + sorted(set(custodian_types + [entry_dict["custodian"]["type"]])) + ["other"]
+            new_custodian_type = st.selectbox(
+                label="The current category of the data custodian, person, or organization is the following.",
+                options=custodian_type_choices,
+                index=custodian_type_choices.index(entry_dict["custodian"]["type"])
             )
-        new_custodian_location = st.selectbox(
-            label="The entity is recoreded as being located or hosted in:",
-            options=countries,
-            index=countries.index(entry_dict["custodian"]["location"])
-        )
-        new_custodian_contact_name = st.text_input(
-            label="The following person is recorded as contact for the entity",
-            value=entry_dict["custodian"]["contact_name"],
-        )
-        new_custodian_contact_email = st.text_input(
-            label="Their contact email is recorded as:",
-            value=entry_dict["custodian"]["contact_email"],
-        )
-        new_custodian_additional = st.text_input(
-            label="The following URL is recorded as a place to find more information about the entity",
-            value=entry_dict["custodian"]["additional"]
-        )
+            if new_custodian_type == "other":
+                new_custodian_type = st.text_input(
+                    label="You entered `other` for the entity type, how would you categorize them?",
+                )
+            new_custodian_location = st.selectbox(
+                label="The entity is recoreded as being located or hosted in:",
+                options=countries,
+                index=countries.index(entry_dict["custodian"]["location"])
+            )
+            new_custodian_contact_name = st.text_input(
+                label="The following person is recorded as contact for the entity",
+                value=entry_dict["custodian"]["contact_name"],
+            )
+            new_custodian_contact_email = st.text_input(
+                label="Their contact email is recorded as:",
+                value=entry_dict["custodian"]["contact_email"],
+            )
+            new_custodian_additional = st.text_input(
+                label="The following URL is recorded as a place to find more information about the entity",
+                value=entry_dict["custodian"]["additional"]
+            )
+        else:
+            new_custodian_name = ""
+            new_custodian_type = ""
+            new_custodian_contact_name = ""
+            new_custodian_contact_email = ""
+            new_custodian_additional = ""
         st.markdown("If you are satisfied with the values for the fields above, press the button below to update and validate the **custodian** section of the entry" if val_mode else "")
         if st.checkbox("Validate: custodian"):
             entry_dict["custodian"]["name"] = new_custodian_name
