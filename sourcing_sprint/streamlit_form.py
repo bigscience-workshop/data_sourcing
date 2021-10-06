@@ -1009,7 +1009,12 @@ with val_col.expander(
     entry_dict = catalogue[entry_id]
     already_validated_list = glob(pjoin("entries", f"{entry_id}-validated*.json"))
     if len(already_validated_list) > 0:
-        st.write("Note: this dataset has already been validated")
+        st.markdown("##### Note: this dataset has already been validated!")
+        fname = st.selectbox(
+            label="would you like to load a validated file for this entry?",
+            options=[pjoin("entries", f"{entry_id}.json")] + already_validated_list,
+        )
+        entry_dict = json.load(open(fname, encoding="utf-8"))
     st.markdown(f"##### Validating: {entry_types.get(entry_dict['type'], '')} - {entry_dict['description']['name']}\n\n{entry_dict['description']['description']}")
 
 if "languages" in entry_dict:
