@@ -49,7 +49,8 @@ In order to make use of the language data indexed in this entry, we need informa
 that either owns or manages it (data custodian). Please use this section to provide such information.
 """
 
-### Countries and languages
+### JSON-formatted resources and taxonomies
+## Countries and languages
 # from Wikipedia and https://unstats.un.org/unsd/methodology/m49/
 regions, countries, region_tree = json.load(open("resources/country_regions.json", encoding="utf-8"))
 country_centers = json.load(open("resources/country_center_coordinates.json", encoding="utf-8"))
@@ -65,7 +66,7 @@ language_lists = json.load(open("resources/language_lists.json", encoding="utf-8
 MAX_LANGS = 25
 MAX_COUNTRIES = 25
 
-### Primary source categories
+# primary source categories
 primary_taxonomy = json.load(open("resources/primary_source_taxonomy.json", encoding="utf-8"))
 MAX_SOURCES = 25
 
@@ -79,7 +80,10 @@ custodian_types = [
     "A government organization",
 ]
 
-### Data accessibility
+# file formats for different modalities
+file_formats = json.load(open("resources/file_formats.json", encoding="utf-8"))
+
+## Data accessibility
 # from Data Tooling docs
 pii_categories = json.load(open("resources/pii_categories.json", encoding="utf-8"))
 MAX_PII = 25
@@ -777,6 +781,7 @@ if entry_dict["type"] in ["primary", "processed"]:
         "text_format": [],
         "audiovisual_format": [],
         "image_format": [],
+        "database_format": [],
         "text_is_transcribed": "",
         "instance_type": "",
         "instance_count": "",
@@ -794,9 +799,14 @@ if entry_dict["type"] in ["primary", "processed"]:
             help="Media data provided with transcription should go into **text**, then select the *transcribed* option. PDFs that have pre-extracted text information should go into **text**, PDFs that need OCR should go into **images**, select the latter if you're unsure",
         )
         if "text" in entry_dict["media"]["category"]:
+            text_format_dict = dict(
+                [(fmt, desc) for fmt, desc in list(file_formats["Text"].items()) + list(file_formats["Web"].items()) + [("other", "other text file format")]]
+            )
+            text_format_list = text_format_dict.keys()
             entry_dict["media"]["text_format"] = st.multiselect(
                 label="What text formats are present in the entry?",
-                options=["plain text", "HTML", "PDF", "XML", "mediawiki", "other"],
+                options=text_format_list,
+                format_func=lambda x: f"{x} | {text_format_dict[x]}",
             )
             if "other" in entry_dict["media"]["text_format"]:
                 entry_dict["media"]["text_format"] += [st.text_input(
@@ -808,23 +818,51 @@ if entry_dict["type"] in ["primary", "processed"]:
                 index=2,
             )
         if "audiovisual" in entry_dict["media"]["category"] or "audiovisual" in entry_dict["media"]["text_is_transcribed"]:
+            audiovisual_format_dict = dict(
+                [(fmt, desc) for fmt, desc in list(file_formats["Audio"].items()) + list(file_formats["Video"].items()) + [("other", "other audiovisual file format")]]
+            )
+            audiovisual_format_list = audiovisual_format_dict.keys()
             entry_dict["media"]["audiovisual_format"] = st.multiselect(
                 label="What format or formats do the audiovisual data come in?",
-                options=["mp4", "wav", "video", "other"],
+                options=audiovisual_format_list,
+                format_func=lambda x: f"{x} | {audiovisual_format_dict[x]}",
             )
             if "other" in entry_dict["media"]["audiovisual_format"]:
                 entry_dict["media"]["audiovisual_format"] += [st.text_input(
                     label="You entered `other` for the audiovisual format, what format is it?",
                 )]
         if "image" in entry_dict["media"]["category"] or "image" in entry_dict["media"]["text_is_transcribed"]:
+            image_format_dict = dict(
+                [(fmt, desc) for fmt, desc in list(file_formats["Image"].items()) + [("other", "other image file format")]]
+            )
+            image_format_list = image_format_dict.keys()
             entry_dict["media"]["image_format"] = st.multiselect(
                 label="What format or formats do the image data come in?",
-                options=["JPEG", "PNG", "PDF", "TIFF", "other"],
+                options=image_format_list,
+                format_func=lambda x: f"{x} | {image_format_dict[x]}",
             )
             if "other" in entry_dict["media"]["image_format"]:
                 entry_dict["media"]["image_format"] += [st.text_input(
                     label="You entered `other` for the image format, what format is it?",
                 )]
+        db_format_dict = dict(
+            [(fmt, desc)
+             for fmt, desc in list(file_formats["Data"].items()) + \
+                list(file_formats["Database"].items()) + \
+                list(file_formats["Compressed"].items()) + \
+                [("other", "other database file format")]]
+        )
+        db_format_list = db_format_dict.keys()
+        entry_dict["media"]["database_format"] = st.multiselect(
+            label="If the data is presented as a database or compressed archive, please select all formats that apply here:",
+            options=db_format_list,
+            format_func=lambda x: f"{x} | {db_format_dict[x]}",
+        )
+        if "other" in entry_dict["media"]["database_format"]:
+            entry_dict["media"]["database_format"] += [st.text_input(
+                label="You entered `other` for the database format, what format is it?",
+            )]
+
 
     with form_col.expander(
         "Media amounts" if add_mode else "",
@@ -1376,11 +1414,17 @@ if "media" in entry_dict and entry_dict["type"] in ["primary", "processed"]:
             key="validate_media_type"
         )
         if "text" in new_media["category"]:
-            text_format_list = sorted(set(entry_dict["media"]["text_format"] + ["plain text", "HTML", "PDF", "XML", "mediawiki"])) + ["other"]
+            text_format_dict = dict(
+                [(fmt, desc) for fmt, desc in list(file_formats["Text"].items()) + list(file_formats["Web"].items()) + [("other", "other text file format")]]
+            )
+            for frm in entry_dict["media"]["text_format"]:
+                text_format_dict[frm] = text_format_dict.get(frm, frm)
+            text_format_list = text_format_dict.keys()
             new_media["text_format"] = st.multiselect(
                 label="What text formats are present in the entry?",
                 options=text_format_list,
                 default=entry_dict["media"]["text_format"],
+                format_func=lambda x: f"{x} | {text_format_dict[x]}",
                 key="validate_text_format",
             )
             new_media["text_is_transcribed"] = st.radio(
@@ -1390,21 +1434,51 @@ if "media" in entry_dict and entry_dict["type"] in ["primary", "processed"]:
                 key="validate_text_is_transcribed",
             )
         if "audiovisual" in new_media["category"] or "audiovisual" in new_media["text_is_transcribed"]:
-            audiovisual_format_list = sorted(set(entry_dict["media"]["audiovisual_format"] + ["mp4", "wav", "video"])) + ["other"]
+            audiovisual_format_dict = dict(
+                [(fmt, desc) for fmt, desc in list(file_formats["Audio"].items()) + list(file_formats["Video"].items()) + [("other", "other audiovisual file format")]]
+            )
+            for frm in entry_dict["media"]["audiovisual_format"]:
+                audiovisual_format_dict[frm] = audiovisual_format_dict.get(frm, frm)
+            audiovisual_format_list = audiovisual_format_dict.keys()
             new_media["audiovisual_format"] = st.multiselect(
                 label="What format or formats do the audiovisual data come in?",
                 options=audiovisual_format_list,
                 default=entry_dict["media"]["audiovisual_format"],
+                format_func=lambda x: f"{x} | {audiovisual_format_dict[x]}",
                 key="validate_audiovisual_format",
             )
         if "image" in new_media["category"] or "image" in new_media["text_is_transcribed"]:
-            image_format_list = sorted(set(entry_dict["media"]["image_format"] + ["JPEG", "PNG", "PDF", "TIFF"])) + ["other"]
+            image_format_dict = dict(
+                [(fmt, desc) for fmt, desc in list(file_formats["Image"].items()) + [("other", "other image file format")]]
+            )
+            for frm in entry_dict["media"]["image_format"]:
+                image_format_dict[frm] = image_format_dict.get(frm, frm)
+            image_format_list = image_format_dict.keys()
             new_media["image_format"] = st.multiselect(
                 label="What format or formats do the image data come in?",
                 options=image_format_list,
                 default=entry_dict["media"]["image_format"],
+                format_func=lambda x: f"{x} | {image_format_dict[x]}",
                 key="validate_image_format"
             )
+        db_format_dict = dict(
+            [(fmt, desc)
+             for fmt, desc in list(file_formats["Data"].items()) + \
+                list(file_formats["Database"].items()) + \
+                list(file_formats["Compressed"].items()) + \
+                [("other", "other database file format")]]
+        )
+        for frm in entry_dict["media"].get("database_format", []):
+            db_format_dict[frm] = db_format_dict.get(frm, frm)
+        db_format_list = db_format_dict.keys()
+        new_media["database_format"] = st.multiselect(
+            label="If the data is presented as a database or compressed archive, please select all formats that apply here:",
+            options=db_format_list,
+            default=entry_dict["media"].get("database_format", []),
+            format_func=lambda x: f"{x} | {db_format_dict[x]}",
+            key="validate_database_format"
+        )
+        # validate media amounts
         instance_type_list = ["", "article", "post", "dialogue", "episode", "book"]
         if entry_dict["media"]["instance_type"] not in instance_type_list:
             instance_type_list = instance_type_list + [entry_dict["media"]["instance_type"]]

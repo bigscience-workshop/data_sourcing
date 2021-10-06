@@ -6,11 +6,11 @@
         ".ODT": "OpenDocument Text Document",
         ".PAGES": "Apple Pages Document",
         ".PDF": "Portable Document Format File",
-        ".RTF": "Rich Text Format File", 
+        ".RTF": "Rich Text Format File",
         ".TEX": "LaTeX Source Document",
         ".TXT": "Plain Text File",
         ".WPD": "WordPerfect Document",
-        ".WPS": "Microsoft Works Document",
+        ".WPS": "Microsoft Works Document"
     },
     "Data": {
         ".CSV" : "Comma-Separated Values File",
