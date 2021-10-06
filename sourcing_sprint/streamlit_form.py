@@ -242,8 +242,8 @@ def filter_entry(entry, filter_dct):
 def can_save(entry_dct, submission_dct, adding_mode):
     if add_mode and (entry_dct['uid'] == "" or isfile(pjoin("entries", f"{entry_dct['uid']}.json"))):
         return False, f"There is already an entry with `uid` {entry_dct['uid']}, you need to give your entry a different one before saving. You can look at the entry with this `uid` by switching to the **Validate an existing entry** mode of this app in the left sidebar."
-    if adding_mode and submission_dct["submitted_by"] == "":
-        return False, f"Please enter a name (or pseudonym) in the left sidebar before submitting this entry."
+    if adding_mode and (submission_dct["submitted_by"] == "" or submission_dct["submitted_email"] == ""):
+        return False, f"Please enter a name (or pseudonym) and email in the left sidebar before submitting this entry. [Privacy policy](https://github.com/bigscience-workshop/data_sourcing/wiki/Required-User-Information-and-Privacy-Policy)"
     if not adding_mode and submission_dct["validated_by"] == "":
         return False, f"Please enter a name (or pseudonym) in the left sidebar before validating this entry."
     if adding_mode and entry_dict["custodian"]["contact_submitter"] and submission_dct["submitted_email"] == "":
@@ -314,6 +314,7 @@ with st.sidebar.expander("User information", expanded=add_mode or val_mode):
         submission_info_dict["submitted_email"] = user_email
     else:
         submission_info_dict["validated_by"] = user_name
+    st.markdown("[Privacy policy](https://github.com/bigscience-workshop/data_sourcing/wiki/Required-User-Information-and-Privacy-Policy)")
 
 st.markdown("#### BigScience Catalogue of Language Data and Resources")
 collapse_all = st.checkbox("Collapse all fields", value=True)
