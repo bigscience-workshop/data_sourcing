@@ -79,7 +79,11 @@ For *Le Monde newspaper*, the macroscopic area would be `Western Europe` and the
 
 #### 3.1.3. Entry Representative, Owner, or Custodian
 
-From the dropdown box, please select the type of entity you are providing information about. Possible answers include `a private individual`, `a commercial entity`, `a library, museum, or archival institute`, `a university or research institution`, `a nonprofit/NGO`, `a government organization`, and `other`. If you select `other`, please provide a description. 
+In order to make use of the language data indexed in this entry, we need information about the person or organization that either owns or manages it (data custodian). We may contact them after the hackathon for permission to use their data or for further information when cataloging the data. 
+
+If the data is owned or managed by an organization that has already been submitted to the catalogue, select the data custodian from the dropdown menu and continue with the rest of the form. 
+
+Otherwise, please enter the name of the data custodian in the textbox. From the dropdown box, please select the type of entity you are providing information about. Possible answers include `a private individual`, `a commercial entity`, `a library, museum, or archival institute`, `a university or research institution`, `a nonprofit/NGO`, `a government organization`, and `other`. If you select `other`, please provide a description. 
 
 Select the country, nation, region, or territory where the entity is located or hosted. Please enter the name of a contact person for the entity. The textbox will autopopulate with the name of the entity, but please replace this with the name of an individual if there is a specific person we can direct our query to. If available, please enter an email address that can be used to ask them about using/obtaining their data.
 
@@ -115,7 +119,7 @@ If there are no licenses or terms of service, or if it is unclear as to what the
 
 ##### Personally Identifiable Information
 
-Please provide as much information as you can find about the data's contents related to personally identifiable information (PII). This kind of information will impact the BigScience dataset and model in terms of privacy, security, and social impact. For more information please see **###LINK###**. 
+Please provide as much information as you can find about the data's contents related to personally identifiable information (PII). This kind of information will impact the BigScience dataset and model in terms of privacy, security, and social impact. For more information please see the BigScience documentation on [Tools to Address PII, Content Rights and Bias](https://docs.google.com/document/d/12jNSbiZDoAUWtXg6fgs0hkUBEEdkHZy7bNVk6oz6MSc/edit#heading=h.k2tpgjjy1cg6). 
 
 We categorize personally identifiable information into three categories:
 
@@ -210,9 +214,11 @@ For the *EXAMS QA dataset*, the macroscopic areas would be `Northern Africa`, `W
 
 #### 3.2.3. Entry Representative, Owner, or Custodian
 
-In order to make use of the language data indexed in this entry, we need information about the person or organization that either owns or manages it (data custodian).
+In order to make use of the language data indexed in this entry, we need information about the person or organization that either owns or manages it (data custodian). We may contact them after the hackathon for permission to use their data or for further information when cataloging the data. 
 
-Please enter the name of the data custodian in the textbox. From the dropdown box, please select the type of entity you are providing information about. Possible answers include `a private individual`, `a commercial entity`, `a library, museum, or archival institute`, `a university or research institution`, `a nonprofit/NGO`, `a government organization`, and `other`. If you select `other`, please provide a description. 
+If the data is owned or managed by an organization that has already been submitted to the catalogue, select the data custodian from the dropdown menu and continue with the rest of the form. 
+
+Otherwise, please enter the name of the data custodian in the textbox. From the dropdown box, please select the type of entity you are providing information about. Possible answers include `a private individual`, `a commercial entity`, `a library, museum, or archival institute`, `a university or research institution`, `a nonprofit/NGO`, `a government organization`, and `other`. If you select `other`, please provide a description. 
 
 Select the country, nation, region, or territory where the entity is located or hosted. Please enter the name of a contact person for the entity. The textbox will autopopulate with the name of the entity, but please replace this with the name of an individual if there is a specific person we can direct our query to. If available, please enter an email address that can be used to ask them about using/obtaining their data.
 
@@ -248,7 +254,7 @@ The *EXAMS QA dataset* is under an `open license`, specifically the `CC-BY-SA-4.
 
 ##### Personally Identifiable Information
 
-Please provide as much information as you can find about the data's contents related to personally identifiable information. This kind of information will impact the BigScience dataset and model in terms of privacy, security, and social impact. For more information please see **###LINK###**. 
+Please provide as much information as you can find about the data's contents related to personally identifiable information. This kind of information will impact the BigScience dataset and model in terms of privacy, security, and social impact. For more information please see the BigScience documentation on [Tools to Address PII, Content Rights and Bias](https://docs.google.com/document/d/12jNSbiZDoAUWtXg6fgs0hkUBEEdkHZy7bNVk6oz6MSc/edit#heading=h.k2tpgjjy1cg6). 
 
 We categorize personally identifiable information into three categories:
 
@@ -350,6 +356,8 @@ For *Creative Commons*, the macroscopic area would be `World-Wide`.
 
 #### 3.3.3. Entry Representative, Owner, or Custodian
 
+In order to collaborate with the language organization or advocate to build up resources, we need contact and location information. We may contact them after the hackathon for permission to use their data or for further information when cataloging the data. 
+
 From the dropdown box, please select the type of entity you are providing information about. Possible answers include `a private individual`, `a commercial entity`, `a library, museum, or archival institute`, `a university or research institution`, `a nonprofit/NGO`, `a government organization`, and `other`. If you select `other`, please provide a description. 
 
 Select the country, nation, region, or territory where the entity is located or hosted. Please enter the name of a contact person for the entity. The textbox will autopopulate with the name of the entity, but please replace this with the name of an individual if there is a specific person we can direct our query to. If available, please enter an email address that can be used to ask them about using/obtaining their data.
@@ -376,10 +384,12 @@ You can also look at individual entries by going to the **View selected resource
 
 To get started, please select the `Validate an existing entry` button in the left sidebar of the form and add your name and your email (optional) in the left sidebar. Then proceed to filling out the form. 
 
-You may select an entry to validate, or validate the entry proposed by the form.
+Select an entry to validate from the list of existing entries. The entry name, type, and description will be shown on selection.
 
-**###TODO###**
+Review each of the sections and edit the responses if needed. When you finish validating a section, check the `Validate:[section]` box at the bottom of that section. 
+
+In the **Review and Save Entry** section, you can review the entry in `json`. When you have finished reviewing the entry, hit the `Save valied entry to catalogue` button at the top of the **Review and Save Entry** section.
 
 ## 6. Contact Information
 
-If you have any questions or issues with the form, please contact **###TODO###**
+If you have any questions or issues with the form, please submit an issue on the Data Sourcing GitHub.
