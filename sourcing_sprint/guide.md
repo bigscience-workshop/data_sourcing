@@ -1,54 +1,55 @@
 # Guide to Submitting Sources to the BigScience Data Sourcing Hackathon
 
 ## Table of Contents
-* [Getting Started](#getting-started)
-* [Loading the Form](#loading-the-form)
-* [Adding a New Entry](#adding-a-new-entry)
-  * [Adding a Primary Source](#adding-a-primary-source)
-    * [Entry Category, Name, ID, Homepage, Description](#entry-category-name-id-homepage-description)
-    * [Entry Languages and Locations](#entry-languages-and-locations)
-    * [Representative, Owner, or Custodian](#representative-owner-or-custodian)
-    * [Availability of the Resource: Procuring, Licenses, PII](#availability-of-the-resource-procuring-licenses-pii)
-    * [Primary Source Type](#primary-source-type)
-    * [Media Type, Format, Size, and Processing Needs](#media-type-format-size-and-processing-needs)
-  * [Adding a Processed Dataset](#adding-a-processed-dataset)
-    * [Entry Category, Name, ID, Homepage, Description](#entry-category-name-id-homepage-description-1)
-    * [Entry Languages and Locations](#entry-languages-and-locations-1)
-    * [Representative, Owner, or Custodian](#representative-owner-or-custodian-1)
-    * [Availability of the Resource: Procuring, Licenses, PII](#availability-of-the-resource-procuring-licenses-pii-1)
-    * [Primary Sources of Processed Dataset](#primary-sources-of-processed-dataset)
-  * [Adding a Language Organization or Advocate](#adding-a-language-organization-or-advocate)
-    * [Entry Category, Name, ID, Homepage, Description](#entry-category-name-id-homepage-description-2)
-    * [Entry Languages and Locations](#entry-languages-and-locations-2)
-    * [Representative, Owner, or Custodian](#representative-owner-or-custodian-2)
-  * [Submitting the Form](#submitting-the-form)
-* [Explore the Current Catalogue](#explore-the-current-catalogue)
-* [Validate an Existing Entry](#validate-an-existing-entry)
-* [Contact Information](#contact-information)
+* [1. Getting Started](#1-getting-started)
+* [2. Loading the Form](#2-loading-the-form)
+* [3. Adding a New Entry](#3-adding-a-new-entry)
+  * [3.1. Adding a Primary Source](#31-adding-a-primary-source)
+    * [3.1.1. Entry Category, Name, ID, Homepage, Description](#311-entry-category-name-id-homepage-description)
+    * [3.1.2. Entry Languages and Locations](#312-entry-languages-and-locations)
+    * [3.1.3. Entry Representative, Owner, or Custodian](#313-entry-representative-owner-or-custodian)
+    * [3.1.4. Availability of the Resource: Procuring, Licenses, PII](#314-availability-of-the-resource-procuring-licenses-pii)
+    * [3.1.5. Primary Source Type](#315-rimary-source-type)
+    * [3.1.6. Media Type, Format, Size, and Processing Needs](#316-media-type-format-size-and-processing-needs)
+  * [3.2. Adding a Processed Dataset](#32-adding-a-processed-dataset)
+    * [3.2.1. Entry Category, Name, ID, Homepage, Description](#321-entry-category-name-id-homepage-description)
+    * [3.2.2. Entry Languages and Locations](#322-entry-languages-and-locations)
+    * [3.2.3. Entry Representative, Owner, or Custodian](#323-entry-representative-owner-or-custodian)
+    * [3.2.4. Availability of the Resource: Procuring, Licenses, PII](#324-availability-of-the-resource-procuring-licenses-pii)
+    * [3.2.5. Primary Sources of Processed Dataset](#325-primary-sources-of-processed-dataset)
+    * [3.2.6. Media Type, Format, Size, and Processing Needs](#326-media-type-format-size-and-processing-needs)
+  * [3.3. Adding a Language Organization or Advocate](#33-adding-a-language-organization-or-advocate)
+    * [3.3.1. Entry Category, Name, ID, Homepage, Description](#331-entry-category-name-id-homepage-description)
+    * [3.3.2. Entry Languages and Locations](#332-entry-languages-and-locations)
+    * [3.3.3. Entry Representative, Owner, or Custodian](#333-entry-representative-owner-or-custodian)
+  * [3.4 Submitting the Form](#34-submitting-the-form)
+* [4. Explore the Current Catalogue](#4-explore-the-current-catalogue)
+* [5. Validate an Existing Entry](#5-validate-an-existing-entry)
+* [6. Contact Information](#6-contact-information)
 
-## Getting Started
+## 1. Getting Started
 
 Thank you for participating in the BigScience Data Sourcing hackathon! Please use this guide as you submit information about potential data sources for the BigScience dataset using the form.
 
-## Loading the Form
+## 2. Loading the Form
 
 You can load the form on your browser by going to: http://23.251.145.180:8501/
 
 There are three app modes to select from in the left sidebar of the form: `Add a new entry`, `Explore the current catalogue`, and `Validate an existing entry`. Select the appropriate tab to either complete the form for a new data source submission, look at a map of what sources have been submitted to the hackathon so far, or verify or add information to those submitted sources.
 
-## Adding a New Entry
+## 3. Adding a New Entry
 
 To get started, please select the `Add a new entry` button and add your name and your email (optional) in the left sidebar. Then proceed to filling out the form. 
 
 For the purposes of this work, we're organizing resources into three categories: primary source, processed dataset, and language organization or advocate. Select the type of resource you are providing information for in the **General Information** subsection of the **Entry Category, Name, ID, Homepage, Description** section of the form.
 
-### Adding a Primary Source
+### 3.1. Adding a Primary Source
 
 A primary source is a single source of language data (text or speech), such as a newspaper, radio, website, book collection, etc. We're particularly interested in this kind of data as it helps us towards our goal of building a more representative data catalogue by expanding our search beyond online resources that are typically found in NLP datasets. 
 
 You will be asked to fill in information about the availability of the source, its properties including availability and presence of personal information, its owners or producers, and the format of the language data.
 
-#### Entry Category, Name, ID, Homepage, Description
+#### 3.1.1. Entry Category, Name, ID, Homepage, Description
 
 First, provide a descriptive name for the resource. This should be a human-readable name such as *Le Monde newspaper*. 
 
@@ -58,7 +59,7 @@ If available, provide a link to the home page for the resource, e.g. https://www
 
 Provide a short description of the resource, in a few words to a few sentences. The description will be used to index and navigate the catalogue. 
 
-#### Entry Languages and Locations
+#### 3.1.2. Entry Languages and Locations
 
 For each entry, we need to catalogue which languages are represented or focused on, as characterized by both the language names and the geographical distribution of the language data creators who contribute to the primary source. We use language data creators to refer to those who wrote the text or spoke the speech that we refer to as data, as opposed to those who may have found, formatted, or created metadata and annotations for the data.
 
@@ -76,7 +77,7 @@ In addition to the names of the languages covered by the entry, we need to know 
 
 For *Le Monde newspaper*, the macroscopic area would be `Western Europe` and the specific country would be `France`.
 
-#### Entry Representative, Owner, or Custodian
+#### 3.1.3. Entry Representative, Owner, or Custodian
 
 From the dropdown box, please select the type of entity you are providing information about. Possible answers include `a private individual`, `a commercial entity`, `a library, museum, or archival institute`, `a university or research institution`, `a nonprofit/NGO`, `a government organization`, and `other`. If you select `other`, please provide a description. 
 
@@ -88,7 +89,7 @@ If there is a URL where we can find out more information about the data owner/cu
 
 For *Le Monde newspaper*, the type is `a commercial entity`, the location of the entity is `France`, the contact name is `Sacha Morard`, the contact email is `droitsdauteur@lemonde.fr` and additional information on the entity is available at `https://fr.wikipedia.org/wiki/Groupe_Le_Monde`. 
 
-#### Availability of the Resource: Procuring, Licenses, PII
+#### 3.1.4. Availability of the Resource: Procuring, Licenses, PII
 
 ##### Obtaining the data: Online availability and data owner/custodian
 
@@ -135,7 +136,7 @@ If no or unclear, please select your reason for why there may not be PII in the 
 
 *Le Monde newspaper* does contain PII. It is `very likely` to contain generic PII such as names and dates. It is `somewhat likely` to contain numberic PII such as telephone numbers. It is `very likely` to contain sensitive PII such as political opinions, racial or ethic origin, health-related data, and religious or philosophical beliefs. 
 
-#### Primary Source Type
+#### 3.1.5. Primary Source Type
 
 Please provide a description for the type of resource. We provide two possible types:
 
@@ -149,7 +150,7 @@ If neither of these options appropriately describes the resource, please select 
 
 For example, *Le Monde newspaper* is a `collection` of `news articles`.
 
-#### Media Type, Format, Size, and Processing Needs
+#### 3.1.6. Media Type, Format, Size, and Processing Needs
 
 ##### Media Type
 
@@ -173,13 +174,13 @@ Please select what an instance in the resource consists of: `article`, `post`, `
 
 For *Le Monde newspaper*, the instances are `articles`, is number of instances is estimated to be `10K<n<100K`, and the number of words per instances is estimated to be `100<n<10,000`. 
 
-### Adding a Processed Dataset
+### 3.2. Adding a Processed Dataset
 
 A processed NLP dataset contains language data that can be used for language modeling. These resources are derived from one or several other primary sources. For example, the CNN/Dailymail summarization dataset is derived from the CNN and Dailymail websites. 
 
 You will be asked to fill in information about the dataset object itself as well as the primary sources it was derived from.
 
-#### Entry Category, Name, ID, Homepage, Description
+#### 3.2.1. Entry Category, Name, ID, Homepage, Description
 
 First, provide a descriptive name for the resource. This should be a human-readable name such as *EXAMS QA dataset*. 
 
@@ -189,7 +190,7 @@ If available, provide a link to the home page for the resource, e.g. https://git
 
 Provide a short description of the resource, in a few words to a few sentences. The description will be used to index and navigate the catalogue. 
 
-#### Entry Languages and Locations
+#### 3.2.2. Entry Languages and Locations
 
 For each entry, we need to catalogue which languages are represented or focused on, as characterized by both the language names and the geographical distribution of the language data creators whose data are contained in the dataset. We use language data creators to refer to those who wrote the text or spoke the speech that we refer to as data, as opposed to those who may have found, formatted, or created metadata and annotations for the data.
 
@@ -207,7 +208,7 @@ In addition to the names of the languages covered by the entry, we need to know 
 
 For the *EXAMS QA dataset*, the macroscopic areas would be `Northern Africa`, `Western Asia`, `South-eastern Asia`, and `Europe`, and the specific countries would be `Albania`, `Bulgaria`, `Croatia`, `France`, `Germany`, `Hungary`, `Italy`, `Lithuania`, `North Macedonia`, `Poland`, `Portugal`, `Qatar`, `Spain`, `Serbia`, `Turkey`, and `Vietnam`. This information isn't always documented for processed datasets, so answer based on your best guess or just answer with the macroscopic areas.
 
-#### Entry Representative, Owner, or Custodian
+#### 3.2.3. Entry Representative, Owner, or Custodian
 
 In order to make use of the language data indexed in this entry, we need information about the person or organization that either owns or manages it (data custodian).
 
@@ -221,7 +222,7 @@ If there is a URL where we can find out more information about the data owner/cu
 
 For the *EXAMS QA dataset*, the data custodian is Sofia University “St. Kliment Ohridski”, which is `a university or research institution`. The location of the entity is `Bulgaria`. The contact person is `Momchil Hardalov`, whose email is `hardalov@@fmi.uni-sofia.bg`. Additional information on the entity is available in the [publication](https://aclanthology.org/2020.emnlp-main.438.pdf). 
 
-#### Availability of the Resource: Procuring, Licenses, PII
+#### 3.2.4. Availability of the Resource: Procuring, Licenses, PII
 
 ##### Obtaining the data: Online availability and data owner/custodian
 
@@ -268,7 +269,7 @@ If no or unclear, please select your reason for why there may not be personally 
 
 The *EXAMS QA dataset* contains questions and answers from high school examinations for a number of subjects. It is therefore `very likely` to have names and dates in the history sections, `unlikely` to have any numerical PII, and `somewhat likely` to contain respondents' political opinions and religious or philosophical beliefs in social science sections.
 
-#### Primary Sources of Processed Dataset
+#### 3.2.5. Primary Sources of Processed Dataset
 
 Please select whether the language data in the dataset was produced at the time of the dataset creation or whether it was taken from a primary source. 
 
@@ -289,7 +290,7 @@ Select one of the following options to characterize the compatibility of the sou
 
 The data in the *EXAMS QA dataset* was taken from a primary source. The dataset curators describe the primary sources, but do not make them readily available. The primary sources are official state exams prepared by the ministries of education of various countries, so the category would be `other`. Because the sources are unknown, it's unclear what the licenses of the primary sources are.
 
-#### Media Type, Format, Size, and Processing Needs
+#### 3.2.6. Media Type, Format, Size, and Processing Needs
 
 ##### Media Type
 
@@ -313,13 +314,13 @@ Please select what an instance in the resource consists of: `article`, `post`, `
 
 The instances in the *EXAMS QA dataset* are `other` with the description being `question`. It has `10K<n<100K` instances, and the number of words per instances is estimated to be `10<n<100`. 
 
-### Adding a Language Organization or Advocate
+### 3.3. Adding a Language Organization or Advocate
 
 A language organization or advocate is an organization holding or working on a set of language resources of various types, formats, and languages. Examples include The Internet Archive, The British Library, l'institut national de l'audiovisuel, Wikimedia Foundation, or other libraries, archival institutions, cultural organizations. 
 
 You will be asked to fill in information about the language organization or advocate itself as well as information on how to get in contact with them.
 
-#### Entry Category, Name, ID, Homepage, Description
+#### 3.3.1. Entry Category, Name, ID, Homepage, Description
 
 First, provide a descriptive name for the resource. This should be a human-readable name such as *Creative Commons*. 
 
@@ -329,7 +330,7 @@ If available, provide a link to the home page for the resource, e.g. https://cre
 
 Provide a short description of the resource, in a few words to a few sentences. The description will be used to index and navigate the catalogue. 
 
-#### Entry Languages and Locations
+#### 3.3.2. Entry Languages and Locations
 
 For each entry, we need to catalogue which languages are represented or focused on, as characterized by both the language names and the geographical distribution of the language data creators that are served by the language organization or advocate. We use language data creators to refer to those who wrote the text or spoke the speech that we refer to as data, as opposed to those who may have found, formatted, or created metadata and annotations for the data.
 
@@ -347,7 +348,7 @@ In addition to the names of the languages covered by the entry, we need to know 
 
 For *Creative Commons*, the macroscopic area would be `World-Wide`.
 
-#### Entry Representative, Owner, or Custodian
+#### 3.3.3. Entry Representative, Owner, or Custodian
 
 From the dropdown box, please select the type of entity you are providing information about. Possible answers include `a private individual`, `a commercial entity`, `a library, museum, or archival institute`, `a university or research institution`, `a nonprofit/NGO`, `a government organization`, and `other`. If you select `other`, please provide a description. 
 
@@ -359,19 +360,19 @@ If there is a URL where we can find out more information about the data owner/cu
 
 For *Creative Commons*, the type is `a nonprofit/NGO`, the location of the entity is `United States of America`, the contact name is the default `Creative Commons`, the contact email is `info@creativecommons.org` and additional information on the entity is available at `https://search.creativecommons.org/`. 
 
-### Submitting the Form
+### 3.4. Submitting the Form
 
 Thank you for filling out the submission form! Please review your answers, which are visible in the **Review and Save Entry** section at the end of the form in json format, prior to submitting.
 
 To submit the form, please enter a name (or pseudonym) in the left sidebar and click `Save entry to catalogue` in the **Review and Save Entry** section of the form. This will save the entry to the repository. You can also download the entry as a `json` file by clicking the `Download entry dictionary` button at the bottom of the form.
 
-## Explore the Current Catalogue
+## 4. Explore the Current Catalogue
 
 To view a map of the current entries, select the `Explore the current catalogue` button in the left sidebar of the form. You can zoom in on the map to see the number of resources based on regions and countries. You can also restrict the shown resources based on resource category, language, the data custodian type, and whether the location is that of the data custodian or the data creators.
 
 You can also look at individual entries by going to the **View selected resources** section below the map. You can select specific entries, and restrict that search by location, to view descriptions of the resources.
 
-## Validate an Existing Entry
+## 5. Validate an Existing Entry
 
 To get started, please select the `Validate an existing entry` button in the left sidebar of the form and add your name and your email (optional) in the left sidebar. Then proceed to filling out the form. 
 
@@ -379,6 +380,6 @@ You may select an entry to validate, or validate the entry proposed by the form.
 
 **###TODO###**
 
-## Contact Information
+## 6. Contact Information
 
 If you have any questions or issues with the form, please contact **###TODO###**
