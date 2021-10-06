@@ -33,7 +33,7 @@ Thank you for participating in the BigScience Data Sourcing hackathon! Please us
 
 ## 2. Loading the Form
 
-You can load the form on your browser by going to: http://23.251.145.180:8501/
+You can load the form on your browser by going to: https://bigscience.huggingface.co/data-catalogue-form
 
 There are three app modes to select from in the left sidebar of the form: `Add a new entry`, `Explore the current catalogue`, and `Validate an existing entry`. Select the appropriate tab to either complete the form for a new data source submission, look at a map of what sources have been submitted to the hackathon so far, or verify or add information to those submitted sources.
 
