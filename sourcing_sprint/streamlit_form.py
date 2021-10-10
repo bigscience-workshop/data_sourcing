@@ -950,8 +950,8 @@ with viz_col.expander("Select resources to visualize" if viz_mode else "", expan
         entry_location_type = st.radio(
             label="I want to visualize",
             options=[
-                "Where the organizations or data custodians are located",
                 "Where the language data creators are located",
+                "Where the organizations or data custodians are located",
             ],
         )
         show_by_org = entry_location_type == "Where the organizations or data custodians are located"
