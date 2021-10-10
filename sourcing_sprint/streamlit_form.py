@@ -1112,6 +1112,7 @@ if "custodian" in entry_dict:
         else:
             new_custodian_name = ""
             new_custodian_type = ""
+            new_custodian_location = ""
             new_custodian_contact_name = ""
             new_custodian_contact_email = ""
             new_custodian_additional = ""
