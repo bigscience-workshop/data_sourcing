@@ -950,8 +950,8 @@ with viz_col.expander("Select resources to visualize" if viz_mode else "", expan
         entry_location_type = st.radio(
             label="I want to visualize",
             options=[
-                "Where the language data creators are located",
                 "Where the organizations or data custodians are located",
+                "Where the language data creators are located",
             ],
         )
         show_by_org = entry_location_type == "Where the organizations or data custodians are located"
@@ -1408,7 +1408,17 @@ if "processed_from_primary" in entry_dict and entry_dict["type"] == "processed":
 
 if "media" in entry_dict and entry_dict["type"] in ["primary", "processed"]:
     val_col.markdown("### Media type, format, size, and processing needs" if val_mode else "")
-    new_media = {}
+    new_media = {
+        "category": [],
+        "text_format": [],
+        "audiovisual_format": [],
+        "image_format": [],
+        "database_format": [],
+        "text_is_transcribed": "",
+        "instance_type": "",
+        "instance_count": "",
+        "instance_size": "",
+    }
     with val_col.expander(
         "Validate media type" if val_mode else "",
         expanded=val_mode and not collapse_all,
