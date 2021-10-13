@@ -441,7 +441,7 @@ with form_col.expander(
         label="Please add any additional comments about the language varieties here (e.g., significant presence of AAVE or code-switching)"
     )
     if st.checkbox("Show other languages"):
-        entry_dict["languages"]["language_names"] = st.multiselect(
+        entry_dict["languages"]["language_names"] += st.multiselect(
             label="For entries that cover languages outside of the current BigScience list, select all that apply here:",
             options=[", ".join(x["description"]) for x in bcp_47_langs],
             help="This is a comprehensive list of languages obtained from the BCP-47 standard list, please select one using the search function",
