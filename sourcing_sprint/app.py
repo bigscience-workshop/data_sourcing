@@ -153,7 +153,7 @@ def add_page(submission_info_dict):
     with st.expander("Show current entry", expanded=True):
         st.markdown("Do not forget to **save your entry** to the BigScience Data Catalogue!\n\nOnce you are done, please press the button below - this will either record the entry or tell you if there's anything you need to change first.")
         if st.button("Save entry to catalogue"):
-            good_to_save, save_message = can_save(entry_dict, submission_info_dict, add_mode)
+            good_to_save, save_message = can_save(entry_dict, submission_info_dict, True)
             if good_to_save:
                 submission_info_dict["entry_uid"] = entry_dict['uid']
                 submission_info_dict["submitted_date"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
@@ -285,7 +285,7 @@ def val_page(submission_info_dict):
     with st.expander("Show current entry", expanded=True):
         st.markdown("Do not forget to **save your work** to the BigScience Data Catalogue!\n\nOnce you are done, please press the button below - this will either record the entry or tell you if there's anything you need to change first.")
         if st.button("Save validated entry to catalogue"):
-            good_to_save, save_message = can_save(entry_dict, submission_info_dict, add_mode)
+            good_to_save, save_message = can_save(entry_dict, submission_info_dict, False)
             if good_to_save:
                 validation_info_dict = json.load(open(pjoin("entry_submitted_by", f"{entry_dict['uid']}.json"), encoding="utf-8"))
                 validation_info_dict["validated_by"] = submission_info_dict['validated_by']
