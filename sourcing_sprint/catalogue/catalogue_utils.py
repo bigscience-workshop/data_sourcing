@@ -62,10 +62,10 @@ def can_save(entry_dct, submission_dct, adding_mode):
         return False, f"Please enter a name (or pseudonym) and email in the left sidebar before submitting this entry. [Privacy policy](https://github.com/bigscience-workshop/data_sourcing/wiki/Required-User-Information-and-Privacy-Policy)"
     if not adding_mode and submission_dct["validated_by"] == "":
         return False, f"Please enter a name (or pseudonym) in the left sidebar before validating this entry."
-    if adding_mode and entry_dict["custodian"]["contact_submitter"] and submission_dct["submitted_email"] == "":
+    if adding_mode and entry_dct["custodian"]["contact_submitter"] and submission_dct["submitted_email"] == "":
         return False, f"You said that you would be willing to reach out to the entity or organization. To do so, please enter an email we can use to follow up in the left sidebar."
-    if not adding_mode and not all([v.get("validated", False) for k, v in entry_dict.items() if isinstance(v, dict)]):
-        unvalidated = [k for k, v in entry_dict.items() if isinstance(v, dict) and not v.get("validated", False)]
+    if not adding_mode and not all([v.get("validated", False) for k, v in entry_dct.items() if isinstance(v, dict)]):
+        unvalidated = [k for k, v in entry_dct.items() if isinstance(v, dict) and not v.get("validated", False)]
         return False, f"Some of the fields haven't been validated: {unvalidated}"
     else:
         return True, ""
