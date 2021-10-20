@@ -9,70 +9,70 @@ with open('Sorted resource list - all languages_20211020.csv', newline='') as cs
         source = {
             "uid": f' {row["#"]}_{row["Dataset title"].replace(" ", "_")}',
             "type": "primary",
+            "imported": True,
             "description": {
                 "name": row["Dataset title"],
-                "description": None,
+                "description": "",
                 "homepage": row["Domain Name / link (if highlighted in red, it's a duplicate! So don't add it...)"],
                 "validated": False
             },
             "languages": {
                 "language_names": row["Language(s) (or family)"].split(','),
                 "language_comments": row["Dialect/accent (if known)"],
-                "language_locations": None,
+                "language_locations": [],
                 "validated": False
             },
             "custodian": {
                 "name": row["Owner"],
-                "type": None,
-                "location": None,
-                "contact_name": None,
-                "contact_email": None,
-                "contact_submitter": None,
-                "additional": None,
+                "type": "",
+                "location": "",
+                "contact_name": "",
+                "contact_email": "",
+                "contact_submitter": "",
+                "additional": "",
                 "validated": False
             },
             "availability": {
                 "procurement": {
-                    "for_download": None,
-                    "download_url": None,
-                    "download_email": None
+                    "for_download": "Not sure",
+                    "download_url": "",
+                    "download_email": ""
                 },
                 "licensing": {
                     "has_licenses": "Yes" if row["License (default is UNKNOWN)"].lower().strip() is not "unknown" else None,
-                    "license_text": None,
-                    "license_properties": None,
-                    "license_list": row["License (default is UNKNOWN)"].lower().strip().split(',')
+                    "license_text": row["License (default is UNKNOWN)"],
+                    "license_properties": [],
+                    "license_list": []
                 },
                 "pii": {
                     "has_pii": "No" if row["Contains Personal Information? (-1=unlikely, 0=neutral, 1=likely)"] == "-1" else "Yes",
                     "generic_pii_likely": "very likely",
-                    "generic_pii_list": None,
+                    "generic_pii_list": [],
                     "numeric_pii_likely": "somewhat likely",
-                    "numeric_pii_list": None,
+                    "numeric_pii_list": [],
                     "sensitive_pii_likely": "very likely",
-                    "sensitive_pii_list": None,
+                    "sensitive_pii_list": [],
                     "no_pii_justification_class": "",
                     "no_pii_justification_text": ""
                 },
                 "validated": False
             },
             "source_category": {
-                "category_type": None,
-                "category_web": None,
-                "category_media": None,
+                "category_type": "",
+                "category_web": "",
+                "category_media": "",
                 "validated": False
             },
             "media": {
-                "category": [
-                    row["Format"]
-                ],
+                "category": [],
                 "text_format": [],
                 "audiovisual_format": [],
                 "image_format": [],
+                "database_format": [],
                 "text_is_transcribed": "Yes" if row["Format"] == "spoken" else "No",
-                "instance_type": None,
-                "instance_count": None,
-                "instance_size": None,
+                "instance_type": "",
+                "instance_count": "",
+                "instance_size": "",
                 "validated": False
             }
         }
