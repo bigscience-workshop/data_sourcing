@@ -47,7 +47,7 @@ def make_multiselect(
     )
 
 
-def make_selectbox(key, label, options, format_func=lambda x: x, help="", index=None):
+def make_selectbox(key, label, options, format_func=lambda x: x, help="", index=None, on_change=None):
     if key in st.session_state:
         st.session_state.save_state[key] = st.session_state[key]
     elif index is not None:
@@ -61,6 +61,7 @@ def make_selectbox(key, label, options, format_func=lambda x: x, help="", index=
             st.session_state.save_state.get(key, options[0])
         ),  # if st.session_state.save_state.get(key, options[0]) in options else 0,
         help=help,
+        on_change=on_change,
     )
 
 
@@ -163,6 +164,12 @@ def form_general_info_add(entry_dict, options):
         )
 
 
+def clear_validation_session_state():
+    clear_keys = [k for k in st.session_state if k.startswith("val_") and k != "val_entry_select"]
+    for val_key in clear_keys:
+        del st.session_state[val_key]
+
+
 def select_entry_val(catalogue, options):
     with st.expander("Select catalogue entry to validate", expanded=False):
         entry_ls = make_selectbox(
@@ -170,6 +177,7 @@ def select_entry_val(catalogue, options):
             label="Select an entry to validate from the existing catalogue",
             options=catalogue,
             format_func=lambda e_ls: f"{e_ls[-1]['uid']} | {e_ls[-1]['description']['name']}",
+            on_change=clear_validation_session_state,
         )
         if len(entry_ls) > 1:
             st.markdown("#### Note: this dataset has already been validated!")
@@ -1197,7 +1205,7 @@ def form_media(entry_dict, options, mode):
             ]
         )
         if mode == "val":
-            for frm in entry_dict["media"]["database_format"]:
+            for frm in entry_dict["media"].get("database_format", []):
                 db_format_dict[frm] = db_format_dict.get(frm, frm)
         db_format_list = db_format_dict.keys()
         entry_dict["media"]["database_format"] = make_multiselect(
@@ -1205,7 +1213,7 @@ def form_media(entry_dict, options, mode):
             label="If the data is presented as a database or compressed archive, please select all formats that apply here:",
             options=db_format_list,
             format_func=lambda x: f"{x} | {db_format_dict[x]}",
-            default=entry_dict["media"]["database_format"] if mode == "val" else None,
+            default=entry_dict["media"].get("database_format", []) if mode == "val" else None,
         )
         if mode == "add" and "other" in entry_dict["media"]["database_format"]:
             entry_dict["media"]["database_format"] += [
