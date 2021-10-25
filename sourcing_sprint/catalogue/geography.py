@@ -1,18 +1,20 @@
 import json
 
 import folium
+import pandas as pd
 from folium import Marker
 from folium.plugins import MarkerCluster
 from jinja2 import Template
-import pandas as pd
 
-regions, countries, region_tree = json.load(open("resources/country_regions.json", encoding="utf-8"))
-country_centers = json.load(open("resources/country_center_coordinates.json", encoding="utf-8"))
+regions, countries, region_tree = json.load(
+    open("resources/country_regions.json", encoding="utf-8")
+)
+country_centers = json.load(
+    open("resources/country_center_coordinates.json", encoding="utf-8")
+)
 country_mappings = json.load(open("resources/country_mappings.json", encoding="utf-8"))
 
-WORLD_GEO_URL = (
-    "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/world-countries.json"
-)
+WORLD_GEO_URL = "https://raw.githubusercontent.com/python-visualization/folium/master/examples/data/world-countries.json"
 
 ICON_CREATE_FUNCTIOM = """
     function(cluster) {
@@ -29,6 +31,7 @@ ICON_CREATE_FUNCTIOM = """
         });
     }
 """
+
 
 class MarkerWithProps(Marker):
     _template = Template(
@@ -52,11 +55,18 @@ class MarkerWithProps(Marker):
         """
     )
 
-    def __init__(self, location, popup=None, tooltip=None, icon=None, draggable=False, props=None):
+    def __init__(
+        self, location, popup=None, tooltip=None, icon=None, draggable=False, props=None
+    ):
         super(MarkerWithProps, self).__init__(
-            location=location, popup=popup, tooltip=tooltip, icon=icon, draggable=draggable
+            location=location,
+            popup=popup,
+            tooltip=tooltip,
+            icon=icon,
+            draggable=draggable,
         )
         self.props = json.loads(json.dumps(props))
+
 
 def get_region_center(region_name):
     latitudes = []
@@ -67,10 +77,13 @@ def get_region_center(region_name):
             latitudes += region_latitudes
             longitudes += region_longitudes
         elif name in country_centers or name in country_mappings["to_center"]:
-            country_center = country_centers[country_mappings["to_center"].get(name, name)]
+            country_center = country_centers[
+                country_mappings["to_center"].get(name, name)
+            ]
             latitudes += [float(country_center["latitude"])]
             longitudes += [float(country_center["longitude"])]
     return latitudes, longitudes
+
 
 def get_region_countries(region_name):
     countries = []
@@ -81,13 +94,16 @@ def get_region_countries(region_name):
             countries += [name]
     return countries
 
+
 def make_choro_map(resource_counts, marker_thres=0):
     world_map = folium.Map(tiles="cartodbpositron", location=[0, 0], zoom_start=1.5)
     marker_cluster = MarkerCluster(icon_create_function=ICON_CREATE_FUNCTIOM)
     marker_cluster.add_to(world_map)
     for name, count in resource_counts.items():
         if name in country_centers or name in country_mappings["to_center"]:
-            country_center = country_centers[country_mappings["to_center"].get(name, name)]
+            country_center = country_centers[
+                country_mappings["to_center"].get(name, name)
+            ]
             MarkerWithProps(
                 location=[country_center["latitude"], country_center["longitude"]],
                 popup=f"{'Region' if name in region_tree else 'Country'} : {name}<br> \n Resources : {count} <br>",
@@ -109,11 +125,18 @@ def make_choro_map(resource_counts, marker_thres=0):
     for loc_name in list(resource_counts.keys()):
         if loc_name in region_tree:
             for country_name in get_region_countries(loc_name):
-                choropleth_counts[country_name] = choropleth_counts.get(country_name, 0) + resource_counts[loc_name]
+                choropleth_counts[country_name] = (
+                    choropleth_counts.get(country_name, 0) + resource_counts[loc_name]
+                )
         else:
-            choropleth_counts[loc_name] = choropleth_counts.get(loc_name, 0) + resource_counts[loc_name]
+            choropleth_counts[loc_name] = (
+                choropleth_counts.get(loc_name, 0) + resource_counts[loc_name]
+            )
     df_resource_counts = pd.DataFrame(
-        [(country_mappings["to_outline"].get(n, n), c) for n, c in choropleth_counts.items()],
+        [
+            (country_mappings["to_outline"].get(n, n), c)
+            for n, c in choropleth_counts.items()
+        ],
         columns=["Name", "Resources"],
     )
     folium.Choropleth(
